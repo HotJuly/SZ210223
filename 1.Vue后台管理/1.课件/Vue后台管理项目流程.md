@@ -2,6 +2,15 @@
 
 ## 一.准备工作
 
+### 资源地址:
+
+- 后台登录帐号:admin
+- 后台登录密码:111111
+- 基础版:https://github.com/PanJiaChen/vue-admin-template
+- 加强版:https://github.com/PanJiaChen/vue-element-admin
+- 后台权限API:http://39.98.123.211:8170/swagger-ui.html#!/index45controller/loginUsingPOST
+- 后台商品API:http://39.98.123.211:8216/swagger-ui.html#!/2183021697SKU2550921475/updateSkuInfoUsingPOST
+
 ### 1.下载模版项目
 
 1. 在github上下载panjiacheng的vue-admin-template后台管理系统模版
@@ -732,5 +741,15 @@
 
 ## 六.首页模块
 
-​	该模块作为自主练习模块
+1. 复制成型的首页替换我们的首页
+2. 安装echarts@4 和 v-charts  还有vue-count-to
+3. 复制和echarts v-charts相关的配置文件 
+   1. plugins文件夹  里面是引入注册使用v-charts
+   2. 复制4个svg图片
+4. 数据可视化
+   1. 使用通俗易懂直观的图表将不直观的数据展示出来
+5. echarts的基本使用(根据官方教程)
+6. 重新使用echarts封装项目的linechart组件
+7. v-charts组件的使用
+8. mixin当中的resize混入文件实现响应式
 
