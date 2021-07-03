@@ -28,6 +28,7 @@ module.exports = {
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
+  // lintOnSave: false,
   productionSourceMap: false,
   devServer: {
     port: port,
@@ -36,7 +37,16 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    proxy:{
+      '/dev-api':{
+        target:"http://39.98.123.211",
+        pathRewrite:{
+          '^/dev-api':''
+        }
+      }
+    }
+    // 截获所有的ajax请求,并返回mockjs的数据
+    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

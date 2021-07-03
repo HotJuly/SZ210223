@@ -29,18 +29,36 @@ const mutations = {
 
 const actions = {
   // user login
-  login({ commit }, userInfo) {
+  // login({ commit }, userInfo) {
+  //   const { username, password } = userInfo
+  //   return new Promise((resolve, reject) => {
+  //     login({ username: username.trim(), password: password })
+  //     .then(response => {
+  //       const { data } = response
+  //       commit('SET_TOKEN', data.token)
+  //       setToken(data.token)
+  //       resolve()
+  //     }).catch(error => {
+  //       reject(error)
+  //     })
+  //   })
+  // },
+
+  
+  async login({ commit }, userInfo) {
     const { username, password } = userInfo
-    return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+    try {
+      const response = await login({ username: username.trim(), password: password });
+      const { data } = response
+      // 将请求回来的token存入Vuex的state中(相当于存储于内存中)
+      commit('SET_TOKEN', data.token)
+      // 将请求回来的token存入cookie中(相当于存储于硬盘中)
+      // cookie相对localStorage的好处:每次发送请求会自动携带该token
+      setToken(data.token)
+    } catch (error) {
+      console.log('error')
+    }
+
   },
 
   // get user info

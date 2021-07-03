@@ -26,7 +26,7 @@
 
 2. #### 删除多余文件,修改部分文件
 
-   1. src->view文件夹
+   1. src->views文件夹
       1. 保留login,dashboard,404三个页面,其余删除
       2. login页面用户登录校验规则进行修改
    2. src->router->index.js文件
@@ -45,7 +45,7 @@
    7. src->store->user.js
       1. 重写action函数-login
          1. 将.then替换成async和await语法
-   8. src->layout->component->Navbar.vue
+   8. src->layout->components->Navbar.vue
       1. 删除点击导航栏的用户头像弹出的操作列表中,多余的选项
    9. src->styles->index.scss
       1. 将样式中最后一行的.app-container类名改为.app-main
