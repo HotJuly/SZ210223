@@ -51,8 +51,41 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
+  },
+
+  {
+    path: '/product',
+    component: Layout,
+    redirect: 'trademark/list',
+    children: [
+      {
+        path: 'trademark/list',
+        name: 'TradeMark',
+        component: () => import('@/views/product/trademark/list'),
+        meta: { title: '品牌管理'}
+      },
+      {
+        path: 'attr/list',
+        name: 'Attr',
+        component: () => import('@/views/product/attr/list'),
+        meta: { title: '属性管理'}
+      },
+      {
+        path: 'spu/list',
+        name: 'SPU',
+        component: () => import('@/views/product/spu/list'),
+        meta: { title: 'SPU管理'}
+      },
+      {
+        path: 'sku/list',
+        name: 'SKU',
+        component: () => import('@/views/product/sku/list'),
+        meta: { title: 'SKU管理'}
+      }
+    ],
+    meta: { title: '商品管理', icon: 'el-icon-s-shop' }
   },
 
   // 404 page must be placed at the end !!!
