@@ -34,8 +34,8 @@
         </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template>
-          <el-button type="warning" size="mini" icon="el-icon-edit"
+        <template slot-scope="{row}">
+          <el-button type="warning" size="mini" icon="el-icon-edit" @click="showDialog(row)"
             >编辑</el-button
           >
           <el-button type="danger" size="mini" icon="el-icon-delete"
@@ -76,7 +76,7 @@
 
       注意:尽量把tmForm的内部结构处理成接口所需要的结构
      -->
-    <el-dialog title="添加品牌" style="width:80%" :visible.sync="dialogFormVisible">
+    <el-dialog :title="tmForm.id?'修改品牌':'添加品牌'" style="width:80%" :visible.sync="dialogFormVisible">
       <el-form :model="tmForm">
         <el-form-item label="品牌名称" label-width="100px">
           <el-input v-model="tmForm.tmName" autocomplete="off"></el-input>
@@ -96,7 +96,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="save"
           >确 定</el-button
         >
@@ -175,7 +175,22 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    showDialog(){
+    showDialog(row){
+      // 该函数添加属性和编辑属性都会调用
+      // 编辑属性的时候会传入row(当前行的数据对象)
+      // 通过id属性判断当前回调函数的触发来源(因为id属性只有经过了服务器的品牌对象才会拥有)
+      if(row.id){
+        // 只有编辑品牌才能进入该区域
+        // 此处是引用值传递
+        // ...是浅拷贝,将当前row对象中的所有属性以及他们的值复制一份到tmForm中
+        this.tmForm = {
+          ...row
+        };
+        // 注意:此方法不可行,因为你只是改变了row变量的内容,template中还是显示数组中的对象,tmForm也指向那个对象
+        // this.tmForm = row;
+        // row={};
+      }
+      console.log('row',row)
       this.dialogFormVisible = true;
     },
     async save(){
@@ -186,18 +201,25 @@ export default {
         //2.发送请求
         await this.$API.trademark.addOrUpdate(this.tmForm);
 
-        // 请求最新的品牌列表,由于添加功能,无法知道当前有几页,所以统一请求第一页
+        
+        //3.成功之后做什么
+        // 3.1请求最新的品牌列表,由于添加功能,无法知道当前有几页,所以统一请求第一页
         this.getTradeMarkList();
 
-        // 弹窗提示用户保存成功
+        // 3.2弹窗提示用户保存成功
          this.$message({
           message: '保存成功!!!',
           type: 'success'
         });
 
-        // 将添加品牌dialog隐藏
+        // 3.3将添加品牌dialog隐藏
         this.dialogFormVisible = false
-        //3.成功之后做什么
+
+        //3.4清空当前dialog的显示数据
+        this.tmForm = {
+          tmName:"",
+          logoUrl:""
+        }
 
       } catch (error) {
         // 弹窗提示用户保存失败
@@ -206,6 +228,13 @@ export default {
 
       //4.失败之后做什么
 
+    },
+    cancel(){
+      this.dialogFormVisible = false;
+      this.tmForm = {
+        tmName:"",
+        logoUrl:""
+      }
     }
   },
 };
