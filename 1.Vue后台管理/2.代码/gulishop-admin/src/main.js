@@ -11,6 +11,17 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
+import * as API from '@/api';
+
+Vue.prototype.$API = API;
+// vm.$API.trademark.getTradeMarkList();
+// vm.$API.user.login();
+
+// var obj = {
+//   A(){
+
+//   }
+// }
 
 import '@/icons' // icon
 import '@/permission' // permission control
@@ -18,9 +29,8 @@ import '@/permission' // permission control
 // 该代码仅为了测试es6语法使用
 // import {default as a} from '@/api/product/trademark';
 // import * as obj from '@/api/product/trademark';
-import { default as c , a ,b} from '@/api/product/trademark';
-
-console.log('a',c , a ,b)
+// import { default as c , a ,b} from '@/api/product/trademark';
+// console.log('a',c , a ,b)
 
 /**
  * If you don't want to use mock-server

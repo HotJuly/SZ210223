@@ -1,9 +1,46 @@
 import request from '@/utils/request';
 
-export default 100;
+export default {
+    // DELETE /admin/product/baseTrademark/remove/{id}
+    // 根据品牌id删除对应品牌
+    deleteTradeMark(id){
+        return request.delete(`/admin/product/baseTrademark/remove/${id}`)
+    },
+    
+    // POST /admin/product/baseTrademark/save
+    // 新增品牌
+    // {
+    //     "logoUrl": "string",
+    //     "tmName": "string"
+    //  }
+    // PUT /admin/product/baseTrademark/update
+    // 修改品牌
+    // {
+    //     "id": 0,                 品牌ID(id属性是后端生成的,也就是说添加品牌不需要传入id,修改才需要)
+    //     "logoUrl": "string",     品牌LOGO链接
+    //     "tmName": "string"       品牌名称
+    // }
+    addOrUpdate(trademark){
+        if(trademark.id){
+            // 有id说明在修改品牌
+            // 请求的时候,传参一定要传第二个参数(代表需要传过去的请求体参数)
+            return request.put(`/admin/product/baseTrademark/update`,trademark);
+        }else{
+            // 没有id说明在新增品牌
+            return request.post(`/admin/product/baseTrademark/save`,trademark);
+        }
+    },
+    
+    // GET /admin/product/baseTrademark/{page}/{limit}
+    // 根据当前页数page和当前页面显示条数limit,获取对应的品牌列表
+    getTradeMarkList(page,limit){
+        return request.get(`/admin/product/baseTrademark/${page}/${limit}`)
+    }
+}
+// export default 100;
 
-export const a = 100;
-export const b = 200;
+// export const a = 100;
+// export const b = 200;
 
 /*
 一共有几种模块化语法:4种

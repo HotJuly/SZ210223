@@ -1,0 +1,33 @@
+// import trademark from "./product/trademark";
+// import user from './user';
+
+// export const trademark = trademark;
+// export const user = user;
+
+// 此处代码相当于上述1和4的结合体,引入之后直接暴露
+export {default as user} from "./user";
+export {default as trademark} from "./product/trademark";
+
+/*
+    1.引入所有模块的api
+        import trademark from "./product/trademark";
+        import user from './user';
+
+    2.将引入的api对象分别暴露出去
+        export const trademark = trademark;
+        export const user = user;
+
+    3.最终index.js暴露出去的内容
+        {
+            trademark:{
+                getTradeMarkList(){},
+                addOrUpdate(){},
+                deleteTradeMark(){}
+            },
+            user:{
+                login(){},
+                logout(){},
+                getInfo(){}
+            }
+        }
+*/
