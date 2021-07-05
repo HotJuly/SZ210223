@@ -82,13 +82,14 @@
           <el-input v-model="tmForm.tmName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="品牌LOGO" label-width="100px">
+          <!-- 此处的action需要填写图片上传的网络路径,但是记得加上前缀/dev-api -->
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="/dev-api/admin/product/fileUpload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <img v-if="tmForm.logoUrl" :src="tmForm.logoUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
           </el-upload>
@@ -96,7 +97,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
+        <el-button type="primary" @click="save"
           >确 定</el-button
         >
       </div>
@@ -115,7 +116,8 @@ export default {
       trademarkList: [],
       dialogFormVisible: false,
       tmForm:{
-        tmName:""
+        tmName:"",
+        logoUrl:""
       },
       imageUrl: ''//不管用不用,先复制过来
     };
@@ -150,10 +152,19 @@ export default {
       this.getTradeMarkList();
     },
     handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
+      //由于用户通过input标签选中图片之后,该图片就存储于浏览器内存中
+      //以下代码是将内存中的图片,生成本地链接地址,用来展示
+      // this.imageUrl = URL.createObjectURL(file.raw);
+      // console.log('handleAvatarSuccess',res, file)
+      this.tmForm.logoUrl = res.data;
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg';
+
+      const types = ['image/jpeg','image/jpg','image/png'];
+      // 用来判断图片的文件类型
+      // const isJPG = file.type === 'image/jpeg';
+      const isJPG = types.includes(file.type);
+      // 用来判断图片的大小是否超过2MB
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isJPG) {
@@ -166,6 +177,35 @@ export default {
     },
     showDialog(){
       this.dialogFormVisible = true;
+    },
+    async save(){
+      //1.收集请求所需要的数据
+      // 已经整理在tmForm中,不需要二次收集
+
+      try {
+        //2.发送请求
+        await this.$API.trademark.addOrUpdate(this.tmForm);
+
+        // 请求最新的品牌列表,由于添加功能,无法知道当前有几页,所以统一请求第一页
+        this.getTradeMarkList();
+
+        // 弹窗提示用户保存成功
+         this.$message({
+          message: '保存成功!!!',
+          type: 'success'
+        });
+
+        // 将添加品牌dialog隐藏
+        this.dialogFormVisible = false
+        //3.成功之后做什么
+
+      } catch (error) {
+        // 弹窗提示用户保存失败
+         this.$message("保存失败!!!");
+      }
+
+      //4.失败之后做什么
+
     }
   },
 };
