@@ -7,6 +7,7 @@
           placeholder="请选择"
           @change="c1Change"
         >
+        <!-- label属性用于控制显示的文本内容,value属性用于控制保存的内容是什么 -->
           <el-option
             :label="c1.name"
             :value="c1.id"
