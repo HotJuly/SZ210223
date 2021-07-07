@@ -38,7 +38,7 @@
           <el-button type="warning" size="mini" icon="el-icon-edit" @click="showDialog(row)"
             >编辑</el-button
           >
-          <el-button type="danger" size="mini" icon="el-icon-delete"
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteAttr(row)"
             >删除</el-button
           >
         </template>
@@ -77,11 +77,11 @@
       注意:尽量把tmForm的内部结构处理成接口所需要的结构
      -->
     <el-dialog :title="tmForm.id?'修改品牌':'添加品牌'" style="width:80%" :visible.sync="dialogFormVisible">
-      <el-form :model="tmForm">
-        <el-form-item label="品牌名称" label-width="100px">
+      <el-form :model="tmForm" :rules="rules" ref="addForm">
+        <el-form-item label="品牌名称" prop="tmName" label-width="100px">
           <el-input v-model="tmForm.tmName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="品牌LOGO" label-width="100px">
+        <el-form-item label="品牌LOGO" prop="logoUrl" label-width="100px">
           <!-- 此处的action需要填写图片上传的网络路径,但是记得加上前缀/dev-api -->
           <el-upload
             class="avatar-uploader"
@@ -119,6 +119,20 @@ export default {
         tmName:"",
         logoUrl:""
       },
+      rules:{
+        // 当前对象中的属性名,必须跟el-form-item组件中的prop对象
+        // 属性值(Object[])就是给对应prop的item组件使用的校验规则
+        // 数组中每一个对象,就是一条校验规则
+        // trigger代表校验时机,在form表单校验中,一共有三个校验时机:
+        // 1.失去焦点(blur事件) 2.内容改变(change) 3.主动校验(通过调用API来实现校验)
+        tmName: [
+          { required: true, message: '请输入品牌名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 3 到 5 个字符', trigger: 'change' }
+        ],
+        logoUrl:[
+          { required: true, message: '请选择LOGO图片', trigger: 'blur' }
+        ]
+      },
       imageUrl: ''//不管用不用,先复制过来
     };
   },
@@ -127,12 +141,15 @@ export default {
     this.getTradeMarkList();
   },
   methods: {
-    async getTradeMarkList() {
+    async getTradeMarkList(page) {
       const {
         data: { total, records },
-      } = await this.$API.trademark.getTradeMarkList(this.page, this.limit);
+      } = await this.$API.trademark.getTradeMarkList(page?page:this.page, this.limit);
       //以上解构赋值相当于:const total = result.data.total;
       this.total = total;
+      if(page){
+        this.page = page;
+      }
       this.trademarkList = records;
     },
     handleCurrentChange(value) {
@@ -193,41 +210,54 @@ export default {
       console.log('row',row)
       this.dialogFormVisible = true;
     },
-    async save(){
-      //1.收集请求所需要的数据
-      // 已经整理在tmForm中,不需要二次收集
+    save(){
+      //首先:先校验数据的合法性,数据没问题在发送请求
+      // console.log(this.$refs.addForm)
+      this.$refs.addForm.validate(async (valid) => {
+        // valid代表当前表单中所有的校验的最终结果
+        // console.log(valid)
+          if (valid) {
+          // 1.收集请求所需要的数据
+          //       已经整理在tmForm中,不需要二次收集
 
-      try {
-        //2.发送请求
-        await this.$API.trademark.addOrUpdate(this.tmForm);
+                try {
+                  //2.发送请求
+                  await this.$API.trademark.addOrUpdate(this.tmForm);
 
-        
-        //3.成功之后做什么
-        // 3.1请求最新的品牌列表,由于添加功能,无法知道当前有几页,所以统一请求第一页
-        this.getTradeMarkList();
+                  
+                  //3.成功之后做什么
+                  // 3.1请求最新的品牌列表,由于添加功能,无法知道当前有几页,所以统一请求第一页
+                  this.getTradeMarkList();
 
-        // 3.2弹窗提示用户保存成功
-         this.$message({
-          message: '保存成功!!!',
-          type: 'success'
+                  // 3.2弹窗提示用户保存成功
+                  this.$message({
+                    message: '保存成功!!!',
+                    type: 'success'
+                  });
+
+                  // 3.3将添加品牌dialog隐藏
+                  this.dialogFormVisible = false
+
+                  //3.4清空当前dialog的显示数据
+                  this.tmForm = {
+                    tmName:"",
+                    logoUrl:""
+                  }
+
+                } catch (error) {
+                  // 弹窗提示用户保存失败
+                  this.$message("保存失败!!!");
+                }
+
+                // 4.失败之后做什么
+
+          } else {
+            this.$message.info("保存失败!!!")
+            return false;
+          }
         });
 
-        // 3.3将添加品牌dialog隐藏
-        this.dialogFormVisible = false
-
-        //3.4清空当前dialog的显示数据
-        this.tmForm = {
-          tmName:"",
-          logoUrl:""
-        }
-
-      } catch (error) {
-        // 弹窗提示用户保存失败
-         this.$message("保存失败!!!");
-      }
-
-      //4.失败之后做什么
-
+      
     },
     cancel(){
       this.dialogFormVisible = false;
@@ -235,6 +265,47 @@ export default {
         tmName:"",
         logoUrl:""
       }
+    },
+    // 监听用户点击删除操作
+    deleteAttr(row){
+       this.$confirm(`此操作将永久删除${row.tmName}, 是否继续?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          // 如果用户点击确定按钮,会执行.then内部的代码
+          try {
+            //1.发送请求删除该品牌
+            await this.$API.trademark.deleteTradeMark(row.id);
+
+            //2.弹窗提示用户删除成功
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+
+            //3.请求最新列表,并展示
+            //3.1如果当前页面删除了该数据,还有数据需要展示,就请求当前页面
+            //3.2如果当前页面删除了该数据,就没有数据了,就请求上一页
+            // console.log(1,this.page)
+            this.getTradeMarkList(this.trademarkList.length>1?this.page:this.page-1);
+
+          } catch (error) {
+            // console.log(error)
+            //2.弹窗提示用户删除失败
+            this.$message({
+              type: 'info',
+              message: '删除失败!'
+            });
+
+          }
+        }).catch(() => {
+          // 如果用户点击取消按钮,会执行.catch内部的代码
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
     }
   },
 };
