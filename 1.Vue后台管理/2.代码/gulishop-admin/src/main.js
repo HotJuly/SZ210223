@@ -12,6 +12,9 @@ import App from './App'
 import store from './store'
 import router from './router'
 import * as API from '@/api';
+import CategorySelector from '@/components/CategorySelector';
+
+Vue.component('CategorySelector',CategorySelector);
 
 Vue.prototype.$API = API;
 // vm.$API.trademark.getTradeMarkList();

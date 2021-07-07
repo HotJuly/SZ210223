@@ -5,8 +5,10 @@
 // export const user = user;
 
 // 此处代码相当于上述1和4的结合体,引入之后直接暴露
-export {default as user} from "./user";
+// export {default as user } from "./user";
 export {default as trademark} from "./product/trademark";
+export {default as category} from "./product/category";
+// this.$API.category.getCategory1()
 
 /*
     1.引入所有模块的api

@@ -18,6 +18,13 @@
     </div>
     <button id="btn">提交</button>
     <script>
+        /*
+            1.通过input[type=file]标签,实现弹窗选择文件功能
+            2.给input绑定change事件回调函数,监听用户选择文件操作
+            3.在change事件中,可以通过this.files获取到用户引入的文件数据
+            4.创建FormData对象,将当前文件数据append进入该对象
+            5.将FprmData对象作为请求体body发送给服务器
+        */
         let formdata= new FormData();
 
         //当用户选择图片时,自动上传
@@ -25,6 +32,7 @@
             console.log(this.files[0])
             const image =this.files[0];
             formdata.append('file',image);
+            console.log('formdata',formdata);
             let result = await axios.post('http://localhost:3000/upload',formdata);
             avatarImg.src="http://localhost:3000"+result.data;
             // const img= new Image();
