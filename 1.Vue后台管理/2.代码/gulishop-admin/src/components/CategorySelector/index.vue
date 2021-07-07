@@ -34,6 +34,7 @@
       <el-form-item label="三级分类">
         <el-select 
           v-model="cForm.category3Id"  
+          @change="c3Change"
           placeholder="请选择"
         >
           <el-option
@@ -89,12 +90,24 @@ export default {
       this.cForm.category3Id = "";
       this.category2List = [];
       this.category3List = [];
+      this.$emit('changeCategory',{id:this.cForm.category1Id,level:1});
     },
     // 当用户选中二级分类时候触发
     c2Change(){
       this.getCategory3();
       this.cForm.category3Id = "";
       this.category3List = [];
+      this.$emit('changeCategory',{id:this.cForm.category2Id,level:2});
+    },
+    // 当用户选中三级分类时候触发
+    c3Change(){
+      // 通知父组件发送请求,并且将当前的三级分类id发送给父组件
+      this.$emit('changeCategory',{id:this.cForm.category3Id,level:3});
+      // this.$emit('changeCategory',{
+      //   category1Id:this.cForm.category1Id,
+      //   category2Id:this.cForm.category2Id,
+      //   category3Id:this.cForm.category3Id
+      // });
     }
   },
 };
