@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :inline="true" :model="cForm" class="demo-form-inline">
+    <el-form :inline="true" :model="cForm" class="demo-form-inline" :disabled="!isShowList">
       <el-form-item label="一级分类">
         <el-select 
           v-model="cForm.category1Id"  
@@ -64,6 +64,9 @@ export default {
       category2List: [],
       category3List: [],
     };
+  },
+  props:{
+    isShowList:Boolean
   },
   mounted() {
     this.getCategory1();

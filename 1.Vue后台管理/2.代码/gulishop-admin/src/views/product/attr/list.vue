@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card style="margin: 20px 0">
-      <CategorySelector @changeCategory="changeCategory"></CategorySelector>
+      <CategorySelector @changeCategory="changeCategory" :isShowList="isShowList"></CategorySelector>
     </el-card>
     <el-card>
       <!-- 第一个div用于显示属性列表,第二个div用于显示添加/修改属性模块 -->
@@ -44,13 +44,19 @@
                 title="编辑"
                 @click="showAttrForm(row)"
               ></HintButton>
-              <HintButton
-                @click="test"
-                size="mini"
-                type="danger"
-                icon="el-icon-delete"
-                title="删除"
-              ></HintButton>
+
+              <el-popconfirm 
+              :title="`你确定要删除${row.attrName}吗?`" 
+                    @onConfirm="deleteAttr(row.id)"
+                    >
+                  <HintButton
+                    slot="reference"
+                    size="mini"
+                    type="danger"
+                    icon="el-icon-delete"
+                    title="删除"
+                  ></HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -120,21 +126,21 @@
 </template>
 
 <script>
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from "lodash/cloneDeep";
 // 该方法可以生成一个全新的attrForm对象
-const resetAttrForm = () =>({
-        attrName: "",
-        attrValueList: [
-          // {
-          //   attrId: 0, 这是属性的唯一表示,如果是添加肯定没有,修改肯定有
-          //   id: 0, 这是属性值的唯一标识,如果是添加肯定没有,修改可能有
-          //   valueName: "string",
-          // },
-        ],
-        categoryId: 0,//声明当前属性属于哪个分类id
-        categoryLevel: 3,//声明categoryId是几级分类的
-        // id: 0, 新增属性不可能有id,只有修改的时候才会有
-      });
+const resetAttrForm = () => ({
+  attrName: "",
+  attrValueList: [
+    // {
+    //   attrId: 0, 这是属性的唯一表示,如果是添加肯定没有,修改肯定有
+    //   id: 0, 这是属性值的唯一标识,如果是添加肯定没有,修改可能有
+    //   valueName: "string",
+    // },
+  ],
+  categoryId: 0, //声明当前属性属于哪个分类id
+  categoryLevel: 3, //声明categoryId是几级分类的
+  // id: 0, 新增属性不可能有id,只有修改的时候才会有
+});
 export default {
   name: "Attr",
   data() {
@@ -177,72 +183,72 @@ export default {
       console.log(111);
     },
     // 用于监视用户点击添加属性值按钮
-    addAttrValue(){
+    addAttrValue() {
       // 通过给attrValueList插入一个对象,可以让table表格多显示一行,实现添加属性值功能
       // 给每个新增的属性值对象添加一个标识isEdit,用于控制编辑模式/展示模式的切换
       this.attrForm.attrValueList.push({
-        attrId: this.attrForm.id,//其实在添加功能中不需要这行,这行代码是为了兼容修改功能
+        attrId: this.attrForm.id, //其实在添加功能中不需要这行,这行代码是为了兼容修改功能
         valueName: "",
-        isEdit:true
-      })
+        isEdit: true,
+      });
     },
     // 用于监视用户点击添加或者修改按钮时候触发
-    showAttrForm(row){
+    showAttrForm(row) {
       this.isShowList = false;
       // 如果当前是通过点击编辑按钮进入添加属性界面,需要将当前属性对象row赋值给attrForm
-      if(row.id){
+      if (row.id) {
         // 此处由于row内部结构过于复杂,不能使用...对其进行浅拷贝,否则会出现问题
         // 需要对row对象进行深拷贝处理
         // this.attrForm={...row};
         this.attrForm = cloneDeep(row);
 
         // 由于新增了编辑/展示模式切换功能,所以attrForm.attrValueList中的所有对象,必须具有isEdit属性
-        this.attrForm.attrValueList.forEach((item)=>{
+        this.attrForm.attrValueList.forEach((item) => {
           // 如果修改数据中的一个属性值,页面会重新渲染,说明该属性是响应式属性
           // 首先,如果后续新增的属性就不是响应式属性
           // 响应式属性产生的时间点:
-                // 1.数据劫持(数据劫持就是在创建响应式属性)
-                // 2.属性值更新的时候(由于更新响应式属性会触发set方法,内部会对新的属性值进行深度数据劫持)
+          // 1.数据劫持(数据劫持就是在创建响应式属性)
+          // 2.属性值更新的时候(由于更新响应式属性会触发set方法,内部会对新的属性值进行深度数据劫持)
           // item.isEdit = false;错误写法
           // 通过vm.$set或者Vue.set都可以新增响应式属性
-          this.$set(item,"isEdit",false);
-        })
+          this.$set(item, "isEdit", false);
+        });
       }
     },
     // 用于监视用户点击添加属性模块中的取消按钮
-    cancel(){
+    cancel() {
       this.isShowList = true;
     },
     // 用于将属性值名称切换为展示模式
-    toLook(row){
+    toLook(row) {
       // 如果用户没有输入数据,不允许进入展示模式
       // 如果用户输入的数据已经存在(返回值应该是布尔值类型),不允许进入展示模式
       const valueName = row.valueName;
-      const isRepeat = this.attrForm.attrValueList.some((item)=>{
+      const isRepeat = this.attrForm.attrValueList.some((item) => {
         // 由于添加属性值功能是直接往内部添加新对象,所以很可能出现匹配到自己的情况
-        if(item !== row){
+        if (item !== row) {
           return item.valueName === valueName;
         }
         // return false;
-      })
+      });
 
-      if(isRepeat){
+      if (isRepeat) {
         this.$message.info("属性值名称已存在,请重新输入!!!");
         return;
       }
 
-      if(valueName){
+      if (valueName) {
         row.isEdit = false;
         return;
       }
-        // this.$message({
-        //   type:"info",
-        //   message:"属性值名称不能为空!!!"
-        // })
+      // this.$message({
+      //   type:"info",
+      //   message:"属性值名称不能为空!!!"
+      // })
       this.$message.info("属性值名称不能为空!!!");
     },
     // 用于将属性值名称切换为编辑模式
-    toEdit(row){
+    toEdit(row) {
       row.isEdit = true;
       // Promise.then(更新视图,显示input)
       // console.log(row.isEdit)
@@ -255,19 +261,19 @@ export default {
       // 视图更新:Vue 在更新 DOM 时是异步执行的
       // 通过$nextTick的回调函数,一定可以得到当前的最新DOM
       // $nextTick的回调函数会在.then中执行
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         this.$refs.editInput.focus();
-      })
+      });
     },
-    deleteAttrValue($index){
+    deleteAttrValue($index) {
       // console.log('deleteAttrValue');
-      this.attrForm.attrValueList.splice($index,1);
+      this.attrForm.attrValueList.splice($index, 1);
     },
     // 用于监视用户点击添加属性模块中的保存按钮
-    async save(){
+    async save() {
       //1.收集数据
       // 获取到三级分类id,以及attrForm
-      const {category3Id,attrForm} = this;
+      const { category3Id, attrForm } = this;
 
       //2.整理数据结构(满足结构需要)
       // {
@@ -281,48 +287,65 @@ export default {
       //   ],
       //   "categoryId": 0,     新增要
       //   "categoryLevel": 0,     新增要
-      //   "id": 0      
+      //   "id": 0
       // }
       //2.1 将三级分类id存入attrForm中
       attrForm.categoryId = category3Id;
 
       //2.2 如果没有属性名称,也不发送请求
-      if(!attrForm.attrName){
+      if (!attrForm.attrName) {
         this.$message.info("属性名称不能为空,保存失败!!!");
         return;
       }
 
       //2.3 如果没有属性值,也不发送请求
-      if(attrForm.attrValueList.length === 0){
+      if (attrForm.attrValueList.length === 0) {
         this.$message.info("至少需要一个属性值,保存失败!!!");
         return;
       }
 
       //2.4 清除属性值对象身上的多余属性isEdit
-      attrForm.attrValueList.forEach((item)=>{
-        delete item.isEdit
-      })
+      attrForm.attrValueList.forEach((item) => {
+        delete item.isEdit;
+      });
 
       try {
-      //3.发送请求
-      await this.$API.attr.addOrUpdate(attrForm);
-      //4.成功做什么
+        //3.发送请求
+        await this.$API.attr.addOrUpdate(attrForm);
+        //4.成功做什么
 
-      //4.1 返回列表页
-      this.isShowList = true;
-      this.$message.success("保存成功!!!");
+        //4.1 返回列表页
+        this.isShowList = true;
+        this.$message.success("保存成功!!!");
 
-      //4.2 请求最新的列表页并展示
-      this.getAttrList();
+        //4.2 请求最新的列表页并展示
+        this.getAttrList();
 
-      //4.3 清空添加属性模块的数据,防止再次进入的时候,数据残留
-      this.attrForm = resetAttrForm();
+        //4.3 清空添加属性模块的数据,防止再次进入的时候,数据残留
+        // this.attrForm = resetAttrForm();
       } catch (error) {
-      //5.失败做什么
+        //5.失败做什么
         this.$message.info("保存失败!!!");
+      }
+    },
+    // 用于监视用户点击属性列表中的删除按钮
+    async deleteAttr(id){
+      try {
+        await this.$API.attr.deleteAttr(id);
+        this.$message.success('删除成功!!!');
+        this.getAttrList();
+      } catch (error) {
+        this.$message.success('删除失败!!!');
       }
     }
   },
+  watch:{
+    isShowList(newValue){
+      if(newValue){
+        this.attrForm = resetAttrForm();
+      }
+    }
+  }
 };
 </script>
 
