@@ -74,7 +74,7 @@
           @click="addAttrValue"
           >添加属性值</el-button
         >
-        <el-button>取消</el-button>
+        <el-button @click="cancel">取消</el-button>
 
         <el-table
           style="width: 100%; margin: 20px 0"
@@ -86,9 +86,15 @@
           <el-table-column prop="prop" label="属性值名称">
             <template slot-scope="{ row }">
               <el-input
+                v-if="row.isEdit"
                 v-model="row.valueName"
                 placeholder="请输入属性值"
+                @blur="toLook(row)"
               ></el-input>
+              <div
+                @click="toEdit(row)" 
+                v-else
+              >{{row.valueName}}</div>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -99,13 +105,14 @@
         </el-table>
 
         <el-button type="primary">确定</el-button>
-        <el-button>取消</el-button>
+        <el-button @click="cancel">取消</el-button>
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
 export default {
   name: "Attr",
   data() {
@@ -162,18 +169,55 @@ export default {
     // 用于监视用户点击添加属性值按钮
     addAttrValue(){
       // 通过给attrValueList插入一个对象,可以让table表格多显示一行,实现添加属性值功能
+      // 给每个新增的属性值对象添加一个标识isEdit,用于控制编辑模式/展示模式的切换
       this.attrForm.attrValueList.push({
         attrId: this.attrForm.id,//其实在添加功能中不需要这行,这行代码是为了兼容修改功能
-        valueName: ""
+        valueName: "",
+        isEdit:true
       })
     },
+    // 用于监视用户点击添加或者修改按钮时候触发
     showAttrForm(row){
       this.isShowList = false;
       // 如果当前是通过点击编辑按钮进入添加属性界面,需要将当前属性对象row赋值给attrForm
       if(row.id){
-        this.attrForm=row;
+        // 此处由于row内部结构过于复杂,不能使用...对其进行浅拷贝,否则会出现问题
+        // 需要对row对象进行深拷贝处理
+        // this.attrForm={...row};
+        this.attrForm = cloneDeep(row);
+
+        // 由于新增了编辑/展示模式切换功能,所以attrForm.attrValueList中的所有对象,必须具有isEdit属性
+        this.attrForm.attrValueList.forEach((item)=>{
+          // 如果修改数据中的一个属性值,页面会重新渲染,说明该属性是响应式属性
+          // 首先,如果后续新增的属性就不是响应式属性
+          // 响应式属性产生的时间点:数据劫持(数据劫持就是在创建响应式属性)
+          // item.isEdit = false;错误写法
+          // 通过vm.$set或者Vue.set都可以新增响应式属性
+          this.$set(item,"isEdit",false);
+        })
       }
-    }
+    },
+    // 用于监视用户点击添加属性模块中的取消按钮
+    cancel(){
+      this.isShowList = true;
+    },
+    // 用于将属性值名称切换为展示模式
+    toLook(row){
+      // 如果用户没有输入数据,不允许进入展示模式
+      if(row.valueName){
+        row.isEdit = false;
+      }else{
+        // this.$message({
+        //   type:"info",
+        //   message:"属性值名称不能为空!!!"
+        // })
+        this.$message.info("属性值名称不能为空!!!")
+      }
+    },
+    // 用于将属性值名称切换为编辑模式
+    toEdit(row){
+      row.isEdit = true;
+    },
   },
 };
 </script>
