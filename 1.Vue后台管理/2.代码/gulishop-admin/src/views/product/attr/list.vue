@@ -87,6 +87,7 @@
             <template slot-scope="{ row }">
               <el-input
                 v-if="row.isEdit"
+                ref="editInput"
                 v-model="row.valueName"
                 placeholder="请输入属性值"
                 @blur="toLook(row)"
@@ -190,7 +191,9 @@ export default {
         this.attrForm.attrValueList.forEach((item)=>{
           // 如果修改数据中的一个属性值,页面会重新渲染,说明该属性是响应式属性
           // 首先,如果后续新增的属性就不是响应式属性
-          // 响应式属性产生的时间点:数据劫持(数据劫持就是在创建响应式属性)
+          // 响应式属性产生的时间点:
+                // 1.数据劫持(数据劫持就是在创建响应式属性)
+                // 2.属性值更新的时候(由于更新响应式属性会触发set方法,内部会对新的属性值进行深度数据劫持)
           // item.isEdit = false;错误写法
           // 通过vm.$set或者Vue.set都可以新增响应式属性
           this.$set(item,"isEdit",false);
@@ -204,19 +207,48 @@ export default {
     // 用于将属性值名称切换为展示模式
     toLook(row){
       // 如果用户没有输入数据,不允许进入展示模式
-      if(row.valueName){
+      // 如果用户输入的数据已经存在(返回值应该是布尔值类型),不允许进入展示模式
+      const valueName = row.valueName;
+      const isRepeat = this.attrForm.attrValueList.some((item)=>{
+        // 由于添加属性值功能是直接往内部添加新对象,所以很可能出现匹配到自己的情况
+        if(item !== row){
+          return item.valueName === valueName;
+        }
+        // return false;
+      })
+
+      if(isRepeat){
+        this.$message.info("属性值名称已存在,请重新输入!!!");
+        return;
+      }
+
+      if(valueName){
         row.isEdit = false;
-      }else{
+        return;
+      }
         // this.$message({
         //   type:"info",
         //   message:"属性值名称不能为空!!!"
         // })
-        this.$message.info("属性值名称不能为空!!!")
-      }
+      this.$message.info("属性值名称不能为空!!!");
     },
     // 用于将属性值名称切换为编辑模式
     toEdit(row){
       row.isEdit = true;
+      // Promise.then(更新视图,显示input)
+      // console.log(row.isEdit)
+      // 进入编辑模式之后,立马让input框自动获取焦点,
+      // 防止用户点击两次,同时可以防止input失去焦点事件失效
+      // 如果实现了自动获取焦点功能,那么页面上永远最多只会存在一个input标签
+
+      // 注意:
+      // 数据更新:同步更新状态数据
+      // 视图更新:Vue 在更新 DOM 时是异步执行的
+      // 通过$nextTick的回调函数,一定可以得到当前的最新DOM
+      // $nextTick的回调函数会在.then中执行
+      this.$nextTick(()=>{
+        this.$refs.editInput.focus();
+      })
     },
   },
 };
