@@ -169,7 +169,10 @@ export default {
     },
     showAttrForm(row){
       this.isShowList = false;
-      this.attrForm=row;
+      // 如果当前是通过点击编辑按钮进入添加属性界面,需要将当前属性对象row赋值给attrForm
+      if(row.id){
+        this.attrForm=row;
+      }
     }
   },
 };
