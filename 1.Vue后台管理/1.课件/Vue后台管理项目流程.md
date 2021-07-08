@@ -369,8 +369,12 @@
 
 ### 5.删除属性值实现
 
-1. 在原先的HintButton组件的外层嵌套组件el-popconfirm,用于弹出气泡选择框,询问用户是否删除
+1. 在原先的HintButton组件的外层嵌套组件el-popconfirm,用于弹出气泡选择框,询问用户是否删除(template
+
+   必须要具有slot-scope属性,否则无法显示)
+
 2. 给el-popconfirm组件绑定**onConfirm**事件(**官网写的confirm事件是错误的**),用于响应用户的确认删除操作
+
 3. 在事件回调中,将attrForm.attrValueList数组中,当前的这一项数据弹出该数组
 
 ### 6.保存属性功能实现

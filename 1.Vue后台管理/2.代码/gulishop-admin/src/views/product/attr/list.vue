@@ -16,11 +16,9 @@
             v-show频繁切换的性能优于v-if
        -->
       <div v-show="isShowList">
-        <el-button
-         type="primary" 
-         icon="el-icon-plus" 
-         @click="showAttrForm"
-         >添加属性</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="showAttrForm"
+          >添加属性</el-button
+        >
         <el-table :data="attrList" style="width: 100%; margin-top: 20px" border>
           <el-table-column type="index" label="序号" width="80" align="center">
           </el-table-column>
@@ -38,7 +36,7 @@
             </template>
           </el-table-column>
           <el-table-column label="操作" width="150">
-            <template slot-scope="{row}">
+            <template slot-scope="{ row }">
               <HintButton
                 size="mini"
                 type="primary"
@@ -92,20 +90,29 @@
                 placeholder="请输入属性值"
                 @blur="toLook(row)"
               ></el-input>
-              <div
-                @click="toEdit(row)" 
-                v-else
-              >{{row.valueName}}</div>
+              <div @click="toEdit(row)" v-else>{{ row.valueName }}</div>
             </template>
           </el-table-column>
           <el-table-column label="操作">
-            <template>
-              <HintButton size="mini" type="danger" icon="el-icon-delete" title="删除"></HintButton>
+            <template slot-scope="{ row, $index }">
+              <el-popconfirm
+                :title="`你确定要删除${row.valueName}？`"
+                @onConfirm="deleteAttrValue($index)"
+              >
+                <HintButton
+                  slot="reference"
+                  size="mini"
+                  type="danger"
+                  icon="el-icon-delete"
+                  title="删除"
+                ></HintButton>
+                <!-- <el-button slot="reference">删除</el-button> -->
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
 
-        <el-button type="primary">确定</el-button>
+        <el-button type="primary" @click="save">确定</el-button>
         <el-button @click="cancel">取消</el-button>
       </div>
     </el-card>
@@ -114,16 +121,8 @@
 
 <script>
 import cloneDeep from 'lodash/cloneDeep';
-export default {
-  name: "Attr",
-  data() {
-    return {
-      category1Id: "",
-      category2Id: "",
-      category3Id: "",
-      attrList: [],
-      isShowList: true,
-      attrForm: {
+// 该方法可以生成一个全新的attrForm对象
+const resetAttrForm = () =>({
         attrName: "",
         attrValueList: [
           // {
@@ -135,7 +134,17 @@ export default {
         categoryId: 0,//声明当前属性属于哪个分类id
         categoryLevel: 3,//声明categoryId是几级分类的
         // id: 0, 新增属性不可能有id,只有修改的时候才会有
-      },
+      });
+export default {
+  name: "Attr",
+  data() {
+    return {
+      category1Id: "",
+      category2Id: "",
+      category3Id: "",
+      attrList: [],
+      isShowList: true,
+      attrForm: resetAttrForm(),
     };
   },
   methods: {
@@ -250,6 +259,69 @@ export default {
         this.$refs.editInput.focus();
       })
     },
+    deleteAttrValue($index){
+      // console.log('deleteAttrValue');
+      this.attrForm.attrValueList.splice($index,1);
+    },
+    // 用于监视用户点击添加属性模块中的保存按钮
+    async save(){
+      //1.收集数据
+      // 获取到三级分类id,以及attrForm
+      const {category3Id,attrForm} = this;
+
+      //2.整理数据结构(满足结构需要)
+      // {
+      //   "attrName": "string",新增要
+      //   "attrValueList": [   新增要
+      //     {
+      //       "attrId": 0,
+      //       "id": 0,
+      //       "valueName": "string"新增要
+      //     }
+      //   ],
+      //   "categoryId": 0,     新增要
+      //   "categoryLevel": 0,     新增要
+      //   "id": 0      
+      // }
+      //2.1 将三级分类id存入attrForm中
+      attrForm.categoryId = category3Id;
+
+      //2.2 如果没有属性名称,也不发送请求
+      if(!attrForm.attrName){
+        this.$message.info("属性名称不能为空,保存失败!!!");
+        return;
+      }
+
+      //2.3 如果没有属性值,也不发送请求
+      if(attrForm.attrValueList.length === 0){
+        this.$message.info("至少需要一个属性值,保存失败!!!");
+        return;
+      }
+
+      //2.4 清除属性值对象身上的多余属性isEdit
+      attrForm.attrValueList.forEach((item)=>{
+        delete item.isEdit
+      })
+
+      try {
+      //3.发送请求
+      await this.$API.attr.addOrUpdate(attrForm);
+      //4.成功做什么
+
+      //4.1 返回列表页
+      this.isShowList = true;
+      this.$message.success("保存成功!!!");
+
+      //4.2 请求最新的列表页并展示
+      this.getAttrList();
+
+      //4.3 清空添加属性模块的数据,防止再次进入的时候,数据残留
+      this.attrForm = resetAttrForm();
+      } catch (error) {
+      //5.失败做什么
+        this.$message.info("保存失败!!!");
+      }
+    }
   },
 };
 </script>
