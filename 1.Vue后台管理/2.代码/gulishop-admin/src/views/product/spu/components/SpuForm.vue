@@ -32,11 +32,12 @@
 
       <el-form-item label="SPU图片">
         <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
+          action="/dev-api/admin/product/fileUpload"
           list-type="picture-card"
           :file-list="spuImageList"
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
+          :on-success="handleSuccess"
         >
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -47,8 +48,12 @@
 
       <el-form-item label="销售属性">
         <el-select v-model="spuSaleAttrId" placeholder="还有1未选中">
-          <el-option label="尺码" value="1"> </el-option>
-          <el-option label="内存" value="2"> </el-option>
+          <el-option 
+          v-for="unUseASaleAttr in unUseSaleAttrList"
+          :key="unUseASaleAttr.id"
+          :label="unUseASaleAttr.name" 
+          :value="unUseASaleAttr.id"
+          > </el-option>
         </el-select>
 
         <el-button type="primary" icon="el-icon-plus">添加销售属性</el-button>
@@ -83,11 +88,12 @@
                 @blur="handleInputConfirm"
               >
               </el-input>
+              <!-- 
+                @click="showInput" -->
               <el-button
                 v-else
                 class="button-new-tag"
                 size="small"
-                @click="showInput"
                 >+ New Tag</el-button
               >
             </template>
@@ -160,9 +166,16 @@ export default {
   methods: {
     // 以下两个方法用于实现照片墙功能
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      // 第一个参数是即将被删除的图片对象
+      // 第二个参数是剩余展示的图片组成的数组
+      // console.log(file, fileList);
+
+      // 注意:别去修改所有图片的数组,只需要将最新的剩余数组保存如spuForm的spuImageList中即可
+      this.spuForm.spuImageList = fileList;
     },
     handlePictureCardPreview(file) {
+      // file是当前的图片文件,本地的文件对象
+      console.log(file)
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
@@ -236,7 +249,54 @@ export default {
       // console.log(result)
       this.spuForm = result.data;
     },
+
+    // 用于监视图片上传是否成功,成功会执行该回调函数
+    handleSuccess(response, file, fileList){
+      // response是当前上传接口返回的相应数据
+      //file是当前图片对应的本地文件对象
+      //fileList是当前照片墙展示的数组
+      // console.log(response, file, fileList)
+      this.spuForm.spuImageList = fileList;
+    }
   },
+  computed:{
+    unUseSaleAttrList(){
+      const { spuSaleAttrList:baseSaleAttrList ,spuForm } = this;
+      const {spuSaleAttrList} = spuForm;
+
+      // 去重,保留两个数组中不重复的部分
+      // map(长度与基础数组一样) filter reduce
+      // 注意:spuForm.spuSaleAttrList中的对象的id是在baseSaleAttrId属性中
+      // baseSaleAttrList数组中对象的id,是存储与id属性
+      // const unUseList = baseSaleAttrList.filter((item)=>{
+      //   return !(spuSaleAttrList.some((spuSaleAttr)=>{
+      //     // console.log(spuSaleAttr.id,item.baseSaleAttrId)
+      //     return spuSaleAttr.baseSaleAttrId === item.id;
+      //   }))
+      // });
+
+      //去重思路:
+      // 1.双层for循环
+      // 2.对象+数组
+
+      // 通过对象记录是否出现过某些属性的id
+      const saleAttrObj = {};
+
+      // 遍历较短的数组,将当前数组中出现的所有的销售属性的id存放到对象中,属性值为true
+      spuSaleAttrList.forEach((item)=>{
+        // obj[1]=true
+        saleAttrObj[item.baseSaleAttrId] = true;
+      })
+
+      // 遍历较长的数组,通过当前的属性id,去对象中读取数据,查看是否出现过
+      const unUseList = baseSaleAttrList.filter((item)=>{
+        return !saleAttrObj[item.id]
+      })
+
+      return unUseList;
+
+    }
+  }
   // mounted(){
   //   this.initUpdateSpuForm()
   // }
