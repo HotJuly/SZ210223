@@ -88,6 +88,7 @@ export default {
   name: "SpuForm",
   data() {
     return {
+      // 这里初始化的spuForm只是为了给添加spu使用的,如果是修改Spu,这里的数据没用
       spuForm: {
         category3Id: 0, //代表当前spu属于哪个分类,新增和修改都需要
         description: "", //spu的描述文本
@@ -125,7 +126,10 @@ export default {
       },
       dialogImageUrl: '',
       dialogVisible: false,
-      spuSaleAttrId:""
+      spuSaleAttrId:"",
+      spuImageList:[],
+      spuSaleAttrList:[],
+      trademarkList:[]
     };
   },
   methods:{
@@ -136,8 +140,62 @@ export default {
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    // 如果是新增SPU会执行该函数,请求相关数据
+    initAddSpuForm(){
+      // 一共需要使用2个接口
+// ​     1.获取所有的销售属性信息(在**spu**的api模块中声明)
+// ​     GET /admin/product/baseSaleAttrList
+// ​     2.获取所有的品牌信息(在**trademark**的api模块中声明)
+// ​     GET /admin/product/baseTrademark/getTrademarkList
+
+
+    },
+    // 如果是修改SPU会执行该函数,请求相关数据
+    initUpdateSpuForm(row){
+      // 一共需要使用4个接口
+      //1.获取SPU详细信息(在**spu**的api模块中声明)
+// ​     GET /admin/product/getSpuById/{spuId}
+// ​     2.获取SPU所有图片的列表信息(在**sku**的api模块中声明)
+// ​     GET /admin/product/spuImageList/{spuId}
+// ​     3.获取所有的销售属性信息(在**spu**的api模块中声明)
+// ​     GET /admin/product/baseSaleAttrList
+// ​     4.获取所有的品牌信息(在**trademark**的api模块中声明)
+// ​     GET /admin/product/baseTrademark/getTrademarkList
+      // console.log('initUpdateSpuForm')
+      this.getSpuInfo(row.id);
+      this.getSpuImageList(row.id);
+      this.getBaseSaleAttrList();
+      this.getTradeMarks();
+    },
+
+    async getSpuImageList(id){
+      const result = await this.$API.sku.getSpuImageList(id);
+      // console.log(result)
+      this.spuImageList = result.data;
+    },
+
+    async getBaseSaleAttrList(){
+      const result = await this.$API.spu.getBaseSaleAttrList();
+      // console.log(result)
+      this.spuSaleAttrList=result.data;
+    },
+
+    async getTradeMarks(){
+      const result = await this.$API.trademark.getTradeMarks();
+      console.log(result)
+      this.trademarkList = result.data;
+    },
+
+    async getSpuInfo(id){
+      const result = await this.$API.spu.getSpuInfo(id);
+      // console.log(result)
+      this.spuForm=result.data;
     }
-  }
+  },
+  // mounted(){
+  //   this.initUpdateSpuForm()
+  // }
 };
 </script>
 

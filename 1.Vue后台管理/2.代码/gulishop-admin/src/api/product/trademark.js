@@ -35,6 +35,12 @@ export default {
     // 根据当前页数page和当前页面显示条数limit,获取对应的品牌列表
     getTradeMarkList(page,limit){
         return request.get(`/admin/product/baseTrademark/${page}/${limit}`)
+    },
+    
+    // GET /admin/product/baseTrademark/getTrademarkList
+    // 获取平台中所有的品牌
+    getTradeMarks(){
+        return request.get(`/admin/product/baseTrademark/getTrademarkList`)
     }
 }
 // export default 100;

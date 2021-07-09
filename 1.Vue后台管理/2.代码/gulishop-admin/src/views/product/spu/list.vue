@@ -17,7 +17,7 @@
           <el-table-column prop="description" label="SPU描述">
           </el-table-column>
           <el-table-column label="操作">
-            <template>
+            <template slot-scope="{row}">
               <HintButton
                 type="success"
                 size="mini"
@@ -29,7 +29,7 @@
                 type="primary"
                 size="mini"
                 icon="el-icon-edit"
-                @click="showSpuForm"
+                @click="showSpuForm(row)"
                 title="修改SPU"
               ></HintButton>
               <HintButton
@@ -64,7 +64,7 @@
             but:并不是说组件拆的越多越好,因为每个组件都会生成一个组件实例对象,很消耗性能
             标准:一般工作中以功能进行拆分,其次考虑性能(尽量避免一个组件状态和结构过多)
        -->
-      <SpuForm v-show="isShowSpuForm"></SpuForm>
+      <SpuForm ref="spuForm" v-show="isShowSpuForm"></SpuForm>
       <SkuForm v-show="isShowSkuForm"></SkuForm>
     </el-card>
   </div>
@@ -86,7 +86,7 @@ export default {
       limit: 5,
       total: 20,
       spuList: [],
-      isShowSpuForm:true,
+      isShowSpuForm:false,
       isShowSkuForm:false,
     };
   },
@@ -133,8 +133,12 @@ export default {
       this.getSpuList();
     },
     // 用于显示SpuForm模块
-    showSpuForm(){
+    showSpuForm(row){
       this.isShowSpuForm = true;
+      // 之后会显示出该组件
+      //  间接请求数据(命令spuForm组件请求数据)
+      // console.log(this.$refs.spuForm.spuForm)
+      this.$refs.spuForm.initUpdateSpuForm(row);
     },
     // 用于显示SkuForm模块
     showSkuForm(){
