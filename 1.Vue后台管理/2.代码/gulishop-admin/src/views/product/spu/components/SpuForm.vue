@@ -10,8 +10,13 @@
 
       <el-form-item label="品牌">
         <el-select v-model="spuForm.tmId" placeholder="请选择品牌">
-          <el-option label="苹果" value="1"> </el-option>
-          <el-option label="华为" value="2"> </el-option>
+          <el-option
+            v-for="tm in trademarkList"
+            :key="tm.id"
+            :label="tm.tmName"
+            :value="tm.id"
+          >
+          </el-option>
         </el-select>
       </el-form-item>
 
@@ -29,6 +34,7 @@
         <el-upload
           action="https://jsonplaceholder.typicode.com/posts/"
           list-type="picture-card"
+          :file-list="spuImageList"
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
         >
@@ -41,41 +47,58 @@
 
       <el-form-item label="销售属性">
         <el-select v-model="spuSaleAttrId" placeholder="还有1未选中">
-          <el-option
-            label="尺码"
-            value="1">
-          </el-option>
-          <el-option
-            label="内存"
-            value="2">
-          </el-option>
+          <el-option label="尺码" value="1"> </el-option>
+          <el-option label="内存" value="2"> </el-option>
         </el-select>
 
         <el-button type="primary" icon="el-icon-plus">添加销售属性</el-button>
 
-        <el-table style="width: 100%;margin:20px 0;" border>
-          <el-table-column
-            type="index"
-            align="center"
-            label="序号"
-            width="80">
+        <el-table
+          :data="spuForm.spuSaleAttrList"
+          style="width: 100%; margin: 20px 0"
+          border
+        >
+          <el-table-column type="index" align="center" label="序号" width="80">
           </el-table-column>
-          <el-table-column
-            prop="prop"
-            label="属性名"
-            width="150">
+          <el-table-column prop="saleAttrName" label="属性名" width="150">
           </el-table-column>
-          <el-table-column
-            prop="prop"
-            label="属性值名称列表">
+          <el-table-column label="属性值名称列表">
+            <template slot-scope="{row}">
+              <el-tag
+                v-for="saleAttrValue in row.spuSaleAttrValueList"
+                :key="saleAttrValue.id"
+                closable
+                :disable-transitions="false"
+                @close="handleClose(tag)"
+              >
+                {{saleAttrValue.saleAttrValueName}}
+              </el-tag>
+              <el-input
+                class="input-new-tag"
+                v-if="inputVisible"
+                v-model="inputValue"
+                ref="saveTagInput"
+                size="small"
+                @keyup.enter.native="handleInputConfirm"
+                @blur="handleInputConfirm"
+              >
+              </el-input>
+              <el-button
+                v-else
+                class="button-new-tag"
+                size="small"
+                @click="showInput"
+                >+ New Tag</el-button
+              >
+            </template>
           </el-table-column>
-          <el-table-column
-            label="操作"
-            width="150">
+          <el-table-column label="操作" width="150">
+            <template>
+              <HintButton type="danger" size="mini" icon="el-icon-delete" title="删除"></HintButton>
+            </template>
           </el-table-column>
         </el-table>
 
-        
         <el-button type="primary">保存</el-button>
         <el-button>取消</el-button>
       </el-form-item>
@@ -124,74 +147,95 @@ export default {
           // },
         ],
       },
-      dialogImageUrl: '',
+      dialogImageUrl: "",
       dialogVisible: false,
-      spuSaleAttrId:"",
-      spuImageList:[],
-      spuSaleAttrList:[],
-      trademarkList:[]
+      spuSaleAttrId: "",
+      spuImageList: [],
+      spuSaleAttrList: [],
+      trademarkList: [],
+      inputVisible: false,
+      inputValue: "",
     };
   },
-  methods:{
+  methods: {
     // 以下两个方法用于实现照片墙功能
     handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
+      console.log(file, fileList);
+    },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
     // 如果是新增SPU会执行该函数,请求相关数据
-    initAddSpuForm(){
+    initAddSpuForm() {
       // 一共需要使用2个接口
-// ​     1.获取所有的销售属性信息(在**spu**的api模块中声明)
-// ​     GET /admin/product/baseSaleAttrList
-// ​     2.获取所有的品牌信息(在**trademark**的api模块中声明)
-// ​     GET /admin/product/baseTrademark/getTrademarkList
-
-
+      // ​     1.获取所有的销售属性信息(在**spu**的api模块中声明)
+      // ​     GET /admin/product/baseSaleAttrList
+      // ​     2.获取所有的品牌信息(在**trademark**的api模块中声明)
+      // ​     GET /admin/product/baseTrademark/getTrademarkList
     },
     // 如果是修改SPU会执行该函数,请求相关数据
-    initUpdateSpuForm(row){
+    initUpdateSpuForm(row) {
       // 一共需要使用4个接口
       //1.获取SPU详细信息(在**spu**的api模块中声明)
-// ​     GET /admin/product/getSpuById/{spuId}
-// ​     2.获取SPU所有图片的列表信息(在**sku**的api模块中声明)
-// ​     GET /admin/product/spuImageList/{spuId}
-// ​     3.获取所有的销售属性信息(在**spu**的api模块中声明)
-// ​     GET /admin/product/baseSaleAttrList
-// ​     4.获取所有的品牌信息(在**trademark**的api模块中声明)
-// ​     GET /admin/product/baseTrademark/getTrademarkList
+      // ​     GET /admin/product/getSpuById/{spuId}
+      // ​     2.获取SPU所有图片的列表信息(在**sku**的api模块中声明)
+      // ​     GET /admin/product/spuImageList/{spuId}
+      // ​     3.获取所有的销售属性信息(在**spu**的api模块中声明)
+      // ​     GET /admin/product/baseSaleAttrList
+      // ​     4.获取所有的品牌信息(在**trademark**的api模块中声明)
+      // ​     GET /admin/product/baseTrademark/getTrademarkList
       // console.log('initUpdateSpuForm')
+
+      // async和await的作用范围非常的小,只能影响到当前函数内部
       this.getSpuInfo(row.id);
       this.getSpuImageList(row.id);
       this.getBaseSaleAttrList();
       this.getTradeMarks();
     },
 
-    async getSpuImageList(id){
-      const result = await this.$API.sku.getSpuImageList(id);
+    async getSpuImageList(id) {
+      const { data } = await this.$API.sku.getSpuImageList(id);
       // console.log(result)
-      this.spuImageList = result.data;
+      // 现在的图片对象结构
+      // {
+      //   id: 12;
+      //   imgName: "7155bba4c363065f.jpg";
+      //   imgUrl: "http://47.93.148.192:8080/group1/M00/00/02/rBHu8l-rgfWAVRWzAABUiOmA0ic932.jpg";
+      //   spuId: 3;
+      //   status: "success";
+      //   uid: 1625811494042;
+      // }
+
+      // 照片墙需要的结构
+      // {
+      //   name:"xxxx.jpg",
+      //   url:"xxxxx"
+      // }
+      data.forEach((imgObj) => {
+        imgObj.name = imgObj.imgName;
+        imgObj.url = imgObj.imgUrl;
+      });
+      this.spuImageList = data;
     },
 
-    async getBaseSaleAttrList(){
+    async getBaseSaleAttrList() {
       const result = await this.$API.spu.getBaseSaleAttrList();
       // console.log(result)
-      this.spuSaleAttrList=result.data;
+      this.spuSaleAttrList = result.data;
     },
 
-    async getTradeMarks(){
+    async getTradeMarks() {
       const result = await this.$API.trademark.getTradeMarks();
-      console.log(result)
+      console.log(result);
       this.trademarkList = result.data;
     },
 
-    async getSpuInfo(id){
+    async getSpuInfo(id) {
       const result = await this.$API.spu.getSpuInfo(id);
       // console.log(result)
-      this.spuForm=result.data;
-    }
+      this.spuForm = result.data;
+    },
   },
   // mounted(){
   //   this.initUpdateSpuForm()
@@ -200,4 +244,19 @@ export default {
 </script>
 
 <style>
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
 </style>

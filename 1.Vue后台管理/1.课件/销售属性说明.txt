@@ -1,0 +1,8 @@
+销售属性:
+	spuSaleAttrList->存放的是所有的销售属性
+	spuForm.spuSaleAttrList->当前spu拥有的销售属性
+		添加spu模块中的销售属性列表用于显示当前spu销售属性
+
+	销售属性的select用于显示当前spu还不具有的销售属性
+		spuForm.spuSaleAttrList和spuSaleAttrList中不重复的就是当前spu不具有的属性
+		数组去重

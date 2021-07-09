@@ -147,6 +147,7 @@ export default {
   },
   computed:{
     isShowList(){
+      // 计算属性性能优于watch
       // 只要该计算属性,依赖的数据没有发生变化,该计算属性的结果不会重新计算(计算属性会缓存上一次的结果直接使用)
       // 依赖的数据(此处说的数据,必须是响应式数据)发生变化,计算属性就会重新计算(不一定)
       const {isShowSpuForm,isShowSkuForm} = this;
