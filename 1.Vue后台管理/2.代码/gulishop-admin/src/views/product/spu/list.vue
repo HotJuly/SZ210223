@@ -1,36 +1,49 @@
 <template>
   <div>
-      <el-card style="margin:20px 0;">
-        <CategorySelector @changeCategory="changeCategory" :isShowList="isShowList"><!-- 插槽 --></CategorySelector>
-      </el-card>
-      <el-card>
-        <el-button type="primary" icon="el-icon-plus">添加SPU</el-button>
-        <el-table
-          :data="spuList"
-          style="width: 100%"
-          border
-        >
-          <el-table-column
-            type="index"
-            label="序号"
-            align="center"
-            width="80">
+    <el-card style="margin: 20px 0">
+      <CategorySelector
+        @changeCategory="changeCategory"
+        :isShowList="isShowList"
+        ><!-- 插槽 --></CategorySelector
+      >
+    </el-card>
+    <el-card>
+      <div v-show="isShowList">
+        <el-button type="primary" icon="el-icon-plus" @click="showSpuForm" :disabled="!category3Id">添加SPU</el-button>
+        <el-table :data="spuList" style="width: 100%" border>
+          <el-table-column type="index" label="序号" align="center" width="80">
           </el-table-column>
-          <el-table-column
-            prop="spuName"
-            label="SPU名称">
+          <el-table-column prop="spuName" label="SPU名称"> </el-table-column>
+          <el-table-column prop="description" label="SPU描述">
           </el-table-column>
-          <el-table-column
-            prop="description"
-            label="SPU描述">
-          </el-table-column>
-          <el-table-column
-            label="操作">
+          <el-table-column label="操作">
             <template>
-              <HintButton type="success" size="mini" icon="el-icon-plus" title="添加SKU"></HintButton>
-              <HintButton type="primary" size="mini" icon="el-icon-edit" title="修改SPU"></HintButton>
-              <HintButton type="info" size="mini" icon="el-icon-info" title="查看SKU列表"></HintButton>
-              <HintButton type="danger" size="mini" icon="el-icon-delete" title="删除SPU"></HintButton>
+              <HintButton
+                type="success"
+                size="mini"
+                icon="el-icon-plus"
+                title="添加SKU"
+                @click="showSkuForm"
+              ></HintButton>
+              <HintButton
+                type="primary"
+                size="mini"
+                icon="el-icon-edit"
+                @click="showSpuForm"
+                title="修改SPU"
+              ></HintButton>
+              <HintButton
+                type="info"
+                size="mini"
+                icon="el-icon-info"
+                title="查看SKU列表"
+              ></HintButton>
+              <HintButton
+                type="danger"
+                size="mini"
+                icon="el-icon-delete"
+                title="删除SPU"
+              ></HintButton>
             </template>
           </el-table-column>
         </el-table>
@@ -38,71 +51,110 @@
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          style="text-align:center"
+          style="text-align: center"
           :current-page="page"
-          :page-sizes="[2,5,10]"
+          :page-sizes="[2, 5, 10]"
           :page-size="limit"
           layout="prev, pager, next, jumper,->,sizes,total"
-          :total="total">
+          :total="total"
+        >
         </el-pagination>
-      </el-card>
+      </div>
+      <!-- Vue中,响应式更新视图的最小单位是组件,最小的渲染单位是标签
+            but:并不是说组件拆的越多越好,因为每个组件都会生成一个组件实例对象,很消耗性能
+            标准:一般工作中以功能进行拆分,其次考虑性能(尽量避免一个组件状态和结构过多)
+       -->
+      <SpuForm v-show="isShowSpuForm"></SpuForm>
+      <SkuForm v-show="isShowSkuForm"></SkuForm>
+    </el-card>
   </div>
 </template>
 
 <script>
+import SpuForm from './components/SpuForm.vue';
+import SkuForm from './components/SkuForm.vue';
 export default {
-    name:"SPU",
-    data(){
-      return {
-        category1Id:"",
-        category2Id:"",
-        category3Id:"",
-        isShowList:true,
+  name: "SPU",
+  data() {
+    return {
+      category1Id: "",
+      category2Id: "",
+      category3Id: "",
+      // isShowList: true,
 
-        page:1,
-        limit:5,
-        total:20,
-        spuList:[]
+      page: 1,
+      limit: 5,
+      total: 20,
+      spuList: [],
+      isShowSpuForm:true,
+      isShowSkuForm:false,
+    };
+  },
+  methods: {
+    changeCategory({ id, level }) {
+      // console.log(value)
+      if (level === 1) {
+        this.category1Id = id;
+        this.category2Id = "";
+        this.category3Id = "";
+      } else if (level === 2) {
+        this.category2Id = id;
+        this.category3Id = "";
+      } else if (level === 3) {
+        this.category3Id = id;
+        // 发送请求
+        this.getSpuList();
       }
     },
-    methods:{
-      changeCategory({id,level}){
-        // console.log(value)
-        if(level === 1){
-          this.category1Id = id;
-          this.category2Id = "";
-          this.category3Id = "";
-        }else if(level === 2){
-          this.category2Id = id;
-          this.category3Id = "";
-        }else if(level === 3){
-          this.category3Id = id;
-          // 发送请求
-          this.getSpuList();
-        }
-      },
-      async getSpuList(){
-        // console.log('发送请求中');
-        const {data:{total,records}} = await this.$API.spu.getSpuList(this.page,this.limit,this.category3Id);
-        // console.log(result)
-        this.total = total;
-        this.spuList = records;
-      },
-      handleSizeChange(value){
-        // value为当前修改之后的条数
-        this.limit = value;
-        this.getSpuList();
-      },
-      handleCurrentChange(value){
-        // value为当前修改之后的页数
-        this.page = value;
-        this.getSpuList();
-      }
-    }
 
-}
+    async getSpuList() {
+      // console.log('发送请求中');
+      const {
+        data: { total, records },
+      } = await this.$API.spu.getSpuList(
+        this.page,
+        this.limit,
+        this.category3Id
+      );
+      // console.log(result)
+      this.total = total;
+      this.spuList = records;
+    },
+
+    // 以下两个函数与分页器有关
+    handleSizeChange(value) {
+      // value为当前修改之后的条数
+      this.limit = value;
+      this.getSpuList();
+    },
+    handleCurrentChange(value) {
+      // value为当前修改之后的页数
+      this.page = value;
+      this.getSpuList();
+    },
+    // 用于显示SpuForm模块
+    showSpuForm(){
+      this.isShowSpuForm = true;
+    },
+    // 用于显示SkuForm模块
+    showSkuForm(){
+      this.isShowSkuForm = true;
+    },
+  },
+  computed:{
+    isShowList(){
+      // 只要该计算属性,依赖的数据没有发生变化,该计算属性的结果不会重新计算(计算属性会缓存上一次的结果直接使用)
+      // 依赖的数据(此处说的数据,必须是响应式数据)发生变化,计算属性就会重新计算(不一定)
+      const {isShowSpuForm,isShowSkuForm} = this;
+      return !isShowSpuForm&&!isShowSkuForm;
+    }
+  },
+  components:{
+    SpuForm,
+    SkuForm
+  }
+};
 </script>
 
 <style>
-
 </style>
