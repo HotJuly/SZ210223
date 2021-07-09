@@ -47,16 +47,16 @@
       </el-form-item>
 
       <el-form-item label="销售属性">
-        <el-select v-model="spuSaleAttrId" placeholder="还有1未选中">
+        <el-select v-model="spuSaleAttrStr" :placeholder="unUseSaleAttrList.length?`还有${unUseSaleAttrList.length}个未选中`:'没有了'">
           <el-option 
           v-for="unUseASaleAttr in unUseSaleAttrList"
           :key="unUseASaleAttr.id"
           :label="unUseASaleAttr.name" 
-          :value="unUseASaleAttr.id"
+          :value="`${unUseASaleAttr.name}:${unUseASaleAttr.id}`"
           > </el-option>
         </el-select>
 
-        <el-button type="primary" icon="el-icon-plus">添加销售属性</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="addSaleAttr" :disabled="!spuSaleAttrStr">添加销售属性</el-button>
 
         <el-table
           :data="spuForm.spuSaleAttrList"
@@ -155,7 +155,7 @@ export default {
       },
       dialogImageUrl: "",
       dialogVisible: false,
-      spuSaleAttrId: "",
+      spuSaleAttrStr: "",
       spuImageList: [],
       spuSaleAttrList: [],
       trademarkList: [],
@@ -257,6 +257,29 @@ export default {
       //fileList是当前照片墙展示的数组
       // console.log(response, file, fileList)
       this.spuForm.spuImageList = fileList;
+    },
+    // 用于添加销售属性
+    addSaleAttr(){
+      // 收集数据
+      const {spuSaleAttrStr} = this;
+      const [saleAttrName,baseSaleAttrId] = spuSaleAttrStr.split(':');
+
+      //整理数据结构
+      // 我们手头只有ID,没有属性的属性名
+      // {
+          //   baseSaleAttrId: 0,
+          //   saleAttrName: "",
+          //   spuSaleAttrValueList: [
+          //   ],
+          // },
+      this.spuForm.spuSaleAttrList.push({
+        saleAttrName,
+        baseSaleAttrId,
+        spuSaleAttrValueList:[]
+      });
+
+      // 记得清空spuSaleAttrStr的数据,防止显示错误
+      this.spuSaleAttrStr = "";
     }
   },
   computed:{
