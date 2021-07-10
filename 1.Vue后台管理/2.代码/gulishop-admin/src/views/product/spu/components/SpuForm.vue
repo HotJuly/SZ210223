@@ -83,13 +83,12 @@
           </el-table-column>
           <el-table-column label="属性值名称列表">
             <template slot-scope="{ row }">
-              <!--                 @close="handleClose(tag)"
--->
               <el-tag
-                v-for="saleAttrValue in row.spuSaleAttrValueList"
+                v-for="(saleAttrValue,index) in row.spuSaleAttrValueList"
                 :key="saleAttrValue.id"
                 closable
                 :disable-transitions="false"
+                @close="deleteAttrValue(row,index)"
               >
                 {{ saleAttrValue.saleAttrValueName }}
               </el-tag>
@@ -484,6 +483,9 @@ export default {
       //5.失败做什么
       }
     },
+    deleteAttrValue(row,$index){
+      row.spuSaleAttrValueList.splice($index,1);
+    }
   },
   computed: {
     unUseSaleAttrList() {

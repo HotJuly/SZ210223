@@ -9,7 +9,13 @@
     </el-card>
     <el-card>
       <div v-show="isShowList">
-        <el-button type="primary" icon="el-icon-plus" @click="showSpuForm" :disabled="!category3Id">添加SPU</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="showSpuForm"
+          :disabled="!category3Id"
+          >添加SPU</el-button
+        >
         <el-table :data="spuList" style="width: 100%" border>
           <el-table-column type="index" label="序号" align="center" width="80">
           </el-table-column>
@@ -17,7 +23,7 @@
           <el-table-column prop="description" label="SPU描述">
           </el-table-column>
           <el-table-column label="操作">
-            <template slot-scope="{row}">
+            <template slot-scope="{ row }">
               <HintButton
                 type="success"
                 size="mini"
@@ -38,12 +44,18 @@
                 icon="el-icon-info"
                 title="查看SKU列表"
               ></HintButton>
-              <HintButton
-                type="danger"
-                size="mini"
-                icon="el-icon-delete"
-                title="删除SPU"
-              ></HintButton>
+              <el-popconfirm 
+                :title="`你确定要删除${row.spuName}？`"
+                @onConfirm="deleteASpu(row.id)"
+              >
+                <HintButton
+                  slot="reference"
+                  type="danger"
+                  size="mini"
+                  icon="el-icon-delete"
+                  title="删除SPU"
+                ></HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -64,15 +76,21 @@
             but:并不是说组件拆的越多越好,因为每个组件都会生成一个组件实例对象,很消耗性能
             标准:一般工作中以功能进行拆分,其次考虑性能(尽量避免一个组件状态和结构过多)
        -->
-      <SpuForm ref="spuForm" @success="successSpuForm" :category3Id="category3Id" v-show="isShowSpuForm" :visible.sync="isShowSpuForm"></SpuForm>
+      <SpuForm
+        ref="spuForm"
+        @success="successSpuForm"
+        :category3Id="category3Id"
+        v-show="isShowSpuForm"
+        :visible.sync="isShowSpuForm"
+      ></SpuForm>
       <SkuForm v-show="isShowSkuForm"></SkuForm>
     </el-card>
   </div>
 </template>
 
 <script>
-import SpuForm from './components/SpuForm.vue';
-import SkuForm from './components/SkuForm.vue';
+import SpuForm from "./components/SpuForm.vue";
+import SkuForm from "./components/SkuForm.vue";
 export default {
   name: "SPU",
   data() {
@@ -86,8 +104,8 @@ export default {
       limit: 5,
       total: 20,
       spuList: [],
-      isShowSpuForm:false,
-      isShowSkuForm:false,
+      isShowSpuForm: false,
+      isShowSkuForm: false,
     };
   },
   methods: {
@@ -133,39 +151,49 @@ export default {
       this.getSpuList();
     },
     // 用于显示SpuForm模块
-    showSpuForm(row){
+    showSpuForm(row) {
       this.isShowSpuForm = true;
       // 之后会显示出该组件
       //  间接请求数据(命令spuForm组件请求数据)
       // console.log(this.$refs.spuForm.spuForm)
-      if(row.id){
+      if (row.id) {
         this.$refs.spuForm.initUpdateSpuForm(row);
-      }else{
+      } else {
         this.$refs.spuForm.initAddSpuForm();
       }
     },
     // 用于显示SkuForm模块
-    showSkuForm(){
+    showSkuForm() {
       this.isShowSkuForm = true;
     },
     // 用于观察spuform组件是否保存成功
-    successSpuForm(){
+    successSpuForm() {
       this.getSpuList();
+    },
+    // 用于监视用户点击列表的删除SPU才做
+    async deleteASpu(id){
+      try {
+        await this.$API.spu.deleteSpu(id);
+        this.$message.success('删除成功');
+        this.getSpuList();
+      } catch (error) {
+        this.$message.success('删除失败');
+      }
     }
   },
-  computed:{
-    isShowList(){
+  computed: {
+    isShowList() {
       // 计算属性性能优于watch
       // 只要该计算属性,依赖的数据没有发生变化,该计算属性的结果不会重新计算(计算属性会缓存上一次的结果直接使用)
       // 依赖的数据(此处说的数据,必须是响应式数据)发生变化,计算属性就会重新计算(不一定)
-      const {isShowSpuForm,isShowSkuForm} = this;
-      return !isShowSpuForm&&!isShowSkuForm;
-    }
+      const { isShowSpuForm, isShowSkuForm } = this;
+      return !isShowSpuForm && !isShowSkuForm;
+    },
   },
-  components:{
+  components: {
     SpuForm,
-    SkuForm
-  }
+    SkuForm,
+  },
 };
 </script>
 
