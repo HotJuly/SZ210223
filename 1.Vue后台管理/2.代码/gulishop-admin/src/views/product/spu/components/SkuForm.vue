@@ -2,7 +2,7 @@
   <el-form :model="skuForm" label-width="80px">
     <!-- SPU名称 -->
     <el-form-item label="SPU名称">
-      <span>Apple iPhone 12</span>
+      <span>{{spuForm.spuName}}</span>
     </el-form-item>
 
     <!-- SKU名称 -->
@@ -28,10 +28,14 @@
     <!-- 平台属性 -->
     <el-form-item label="平台属性">
       <el-form label-width="80px" :inline="true">
-        <el-form-item label="苹果">
+        <el-form-item :label="attr.attrName" v-for="attr in attrList" :key="attr.id">
           <el-select value="" placeholder="请选择">
-            <el-option label="12" value="12"></el-option>
-            <el-option label="11" value="11"></el-option>
+            <el-option 
+            v-for="attrValue in attr.attrValueList"
+            :key="attrValue.id"
+            :label="attrValue.valueName" 
+            :value="attrValue.id"
+            ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -41,17 +45,14 @@
     <el-form-item label="销售属性">
       <el-form label-width="80px" :inline="true">
 
-        <el-form-item label="颜色">
+        <el-form-item :label="spuSaleAttr.saleAttrName" v-for="spuSaleAttr in spuSaleAttrList" :key="spuSaleAttr.baseSaleAttrId">
           <el-select value="" placeholder="请选择">
-            <el-option label="绿色" value="12"></el-option>
-            <el-option label="黄色" value="11"></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="版本">
-          <el-select value="" placeholder="请选择">
-            <el-option label="plus" value="12"></el-option>
-            <el-option label="pro" value="11"></el-option>
+            <el-option 
+            v-for="spuSaleAttrValue in spuSaleAttr.spuSaleAttrValueList"
+            :key="spuSaleAttrValue.id"
+            :label="spuSaleAttrValue.saleAttrValueName" 
+            :value="spuSaleAttrValue.id"
+            ></el-option>
           </el-select>
         </el-form-item>
 
@@ -59,22 +60,26 @@
     </el-form-item>
 
     <el-form-item>
-      <el-table style="width: 100%" border>
+      <el-table :data="spuImageList" style="width: 100%" border>
         <el-table-column
           type="selection"
           width="55">
         </el-table-column>
         <el-table-column
-          prop="prop"
           label="图片">
+          <template slot-scope="{row}">
+            <img :src="row.imgUrl" style="width:100px;height:100px" alt="" srcset="">
+          </template>
         </el-table-column>
         <el-table-column
-          prop="prop"
+          prop="imgName"
           label="名称">
         </el-table-column>
         <el-table-column
-          prop="prop"
           label="操作">
+          <template>
+            <el-button type="primary">设为默认值</el-button>
+          </template>
         </el-table-column>
       </el-table>
     </el-form-item>
@@ -136,8 +141,49 @@ export default {
         // spuId: 0,
         // tmId: 0,
       },
+      spuForm:{},
+      category1Id:"",
+      category2Id:"",
+      category3Id:"",
+      attrList:[],
+      spuSaleAttrList:[],
+      spuImageList:[]
     };
   },
+  methods:{
+    async initAddSkuForm(spu,category1Id,category2Id,category3Id){
+      // 总结:需要的数据,三级分类id,spu的id
+      // 1.根据当前的三级分类id,请求对应的平台属性列表(该api查找attr模块)
+      // http://localhost:9529/dev-api/admin/product/attrInfoList/2/13/61
+
+      // 2.根据当前的spuid,请求当前spu拥有的所有销售属性(该api在sku模块)
+      // http://localhost:9529/dev-api/admin/product/spuSaleAttrList/3
+
+      // 3.根据当前的spuid,请求当前spu拥有的所有图片列表(该api在sku模块)
+      // http://localhost:9529/dev-api/admin/product/spuImageList/3
+
+      this.spuForm = spu;
+      this.category1Id = category1Id;
+      this.category2Id = category2Id;
+      this.category3Id = category3Id;
+
+      const promise1 = this.$API.attr.getAttrList(category1Id,category2Id,category3Id);
+
+      const promise2 = this.$API.sku.getSpuSaleAttrList(spu.id);
+
+      const promise3 = this.$API.sku.getSpuImageList(spu.id);
+
+      const result = await Promise.all([promise1,promise2,promise3]);
+
+      this.attrList = result[0].data;
+      this.spuSaleAttrList = result[1].data;
+      this.spuImageList = result[2].data;
+      // .then(()=>{
+      //   // 更新三个数据
+      // })
+      // .catch(()=>{})
+    }
+  }
 };
 </script>
 

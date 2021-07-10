@@ -29,7 +29,7 @@
                 size="mini"
                 icon="el-icon-plus"
                 title="添加SKU"
-                @click="showSkuForm"
+                @click="showSkuForm(row)"
               ></HintButton>
               <HintButton
                 type="primary"
@@ -96,6 +96,7 @@
       ></SpuForm> -->
 
       <SkuForm 
+        ref="skuForm"
         v-show="isShowSkuForm"
         :visible.sync="isShowSkuForm"
       ></SkuForm>
@@ -120,7 +121,7 @@ export default {
       total: 20,
       spuList: [],
       isShowSpuForm: false,
-      isShowSkuForm: true,
+      isShowSkuForm: false,
     };
   },
   methods: {
@@ -183,8 +184,11 @@ export default {
       }
     },
     // 用于显示SkuForm模块
-    showSkuForm() {
+    showSkuForm(row) {
       this.isShowSkuForm = true;
+
+      const {category1Id,category2Id,category3Id} = this;
+      this.$refs.skuForm.initAddSkuForm(row,category1Id,category2Id,category3Id);
     },
     // 用于观察spuform组件是否保存成功
     successSpuForm() {
