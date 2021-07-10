@@ -69,23 +69,27 @@
           </el-table-column>
           <el-table-column label="属性值名称列表">
             <template slot-scope="{row}">
+              <!--                 @close="handleClose(tag)"
+-->
               <el-tag
                 v-for="saleAttrValue in row.spuSaleAttrValueList"
                 :key="saleAttrValue.id"
                 closable
                 :disable-transitions="false"
-                @close="handleClose(tag)"
               >
                 {{saleAttrValue.saleAttrValueName}}
               </el-tag>
+
+              <!-- 
+                @keyup.enter.native="handleInputConfirm"
+                 -->
               <el-input
                 class="input-new-tag"
-                v-if="inputVisible"
-                v-model="inputValue"
+                v-if="row.inputVisible"
+                v-model="row.inputValue"
                 ref="saveTagInput"
                 size="small"
-                @keyup.enter.native="handleInputConfirm"
-                @blur="handleInputConfirm"
+                @blur="handleInputConfirm(row)"
               >
               </el-input>
               <!-- 
@@ -94,8 +98,10 @@
                 v-else
                 class="button-new-tag"
                 size="small"
-                >+ New Tag</el-button
+                @click="toEdit(row)"
+                >+ 添加</el-button
               >
+
             </template>
           </el-table-column>
           <el-table-column label="操作" width="150">
@@ -222,6 +228,13 @@ export default {
 
       // 照片墙需要的结构
       // {
+      //   id: 12;
+      //   imgName: "7155bba4c363065f.jpg";
+      //   imgUrl: "http://47.93.148.192:8080/group1/M00/00/02/rBHu8l-rgfWAVRWzAABUiOmA0ic932.jpg";
+      //   spuId: 3;
+      //   status: "success";
+      //   uid: 1625811494042;
+      // 
       //   name:"xxxx.jpg",
       //   url:"xxxxx"
       // }
@@ -280,17 +293,64 @@ export default {
 
       // 记得清空spuSaleAttrStr的数据,防止显示错误
       this.spuSaleAttrStr = "";
+    },
+    // 监视用户点击添加属性值按钮,自动进入编辑模式
+    toEdit(row){
+      // row.inputVisible = true;
+      this.$set(row,"inputVisible",true);
+
+      this.$nextTick(()=>{
+        this.$refs.saveTagInput.focus();
+      })
+    },
+    // 监视输入框失去焦点,自动进入展示模式
+    handleInputConfirm(row){
+      const {inputValue} = row;
+
+      // 属性值如果为空,提示用户
+      if(!inputValue.trim()){
+        this.$message.info('属性值不能为空,请注意!');
+        return;
+      }
+
+      //属性值如果重复,也提示用户
+      const isRepeat = row.spuSaleAttrValueList.some((item)=>{
+        return item.saleAttrValueName  === inputValue;
+      })
+
+      if(isRepeat){
+        this.$message.info('属性值已存在,添加失败!');
+        return;
+      }
+
+      //能够进入到这里,说明已经经过了toEdit,该属性已经是响应式的,不需要再次添加
+      row.inputVisible = false;
+      // inputVisible = false;注意:不能这么做
+
+      // 将属性值对象推入对应的属性值列表中,用于动态渲染
+      const obj = {
+        baseSaleAttrId: row.baseSaleAttrId, 
+        saleAttrValueName: row.inputValue,
+      }
+
+      row.spuSaleAttrValueList.push(obj);
+
+      // 清空row.inputValue数值,防止旧数据残留
+      row.inputValue = "";
     }
   },
   computed:{
     unUseSaleAttrList(){
+      // 获取总销售属性列表
       const { spuSaleAttrList:baseSaleAttrList ,spuForm } = this;
+      // 当前spu拥有的所有销售属性
       const {spuSaleAttrList} = spuForm;
 
       // 去重,保留两个数组中不重复的部分
       // map(长度与基础数组一样) filter reduce
       // 注意:spuForm.spuSaleAttrList中的对象的id是在baseSaleAttrId属性中
       // baseSaleAttrList数组中对象的id,是存储与id属性
+      // 一个数组长度80,一个数组长度100,最终将要遍历80*100=8000
       // const unUseList = baseSaleAttrList.filter((item)=>{
       //   return !(spuSaleAttrList.some((spuSaleAttr)=>{
       //     // console.log(spuSaleAttr.id,item.baseSaleAttrId)
@@ -301,6 +361,9 @@ export default {
       //去重思路:
       // 1.双层for循环
       // 2.对象+数组
+      // 注意:
+      // 总销售属性中,属性的唯一标识存在id属性中
+      // 当前spu拥有的销售属性的唯一标识,存在baseSaleAttrId属性中
 
       // 通过对象记录是否出现过某些属性的id
       const saleAttrObj = {};
