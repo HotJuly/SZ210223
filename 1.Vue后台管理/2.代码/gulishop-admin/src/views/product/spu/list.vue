@@ -79,11 +79,26 @@
       <SpuForm
         ref="spuForm"
         @success="successSpuForm"
+        @cancel="cancelSpuForm"
         :category3Id="category3Id"
         v-show="isShowSpuForm"
         :visible.sync="isShowSpuForm"
       ></SpuForm>
-      <SkuForm v-show="isShowSkuForm"></SkuForm>
+      
+      <!-- <SpuForm
+        ref="spuForm"
+        @success="successSpuForm"
+        :category3Id="category3Id"
+        v-show="isShowSpuForm"
+
+        :visible="isShowSpuForm"
+        @update:visible = "(value)=>{ isShowSpuForm=value}"
+      ></SpuForm> -->
+
+      <SkuForm 
+        v-show="isShowSkuForm"
+        :visible.sync="isShowSkuForm"
+      ></SkuForm>
     </el-card>
   </div>
 </template>
@@ -105,7 +120,7 @@ export default {
       total: 20,
       spuList: [],
       isShowSpuForm: false,
-      isShowSkuForm: false,
+      isShowSkuForm: true,
     };
   },
   methods: {
@@ -125,18 +140,21 @@ export default {
       }
     },
 
-    async getSpuList() {
+    async getSpuList(page) {
       // console.log('发送请求中');
       const {
         data: { total, records },
       } = await this.$API.spu.getSpuList(
-        this.page,
+        page?page:this.page,
         this.limit,
         this.category3Id
       );
       // console.log(result)
       this.total = total;
       this.spuList = records;
+      if(page){
+        this.page=page;
+      }
     },
 
     // 以下两个函数与分页器有关
@@ -157,6 +175,8 @@ export default {
       //  间接请求数据(命令spuForm组件请求数据)
       // console.log(this.$refs.spuForm.spuForm)
       if (row.id) {
+        // 添加标识来区分是修改SPU还是添加SPU
+        this.flag=true;
         this.$refs.spuForm.initUpdateSpuForm(row);
       } else {
         this.$refs.spuForm.initAddSpuForm();
@@ -168,7 +188,17 @@ export default {
     },
     // 用于观察spuform组件是否保存成功
     successSpuForm() {
-      this.getSpuList();
+      // 如果用户是添加SPU,就应该请求第一页
+      // 如果用户是修改SPU,就应该请求当前页
+      if(this.flag){
+        this.getSpuList();
+      }else{
+        this.getSpuList(1);
+      }
+      this.flag=null;
+    },
+    cancelSpuForm(){
+      this.flag=null;
     },
     // 用于监视用户点击列表的删除SPU才做
     async deleteASpu(id){

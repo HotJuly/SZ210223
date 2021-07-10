@@ -370,8 +370,10 @@ export default {
     },
     // 用于监视用户点击取消按钮操作
     cancel() {
+      // 通知父组件隐藏当前的spuForm组件
       this.$emit("update:visible", false);
       this.resetData();
+      this.$emit('cancel');
     },
     // 用于重置当前组件状态
     resetData() {
@@ -417,6 +419,8 @@ export default {
       spuForm.category3Id = category3Id;
 
       //2.2 图片列表数据处理
+      // 图片墙功能,如果用户没有上传或者删除图片操作,那么spuForm.spuImageList是null
+      // 如果在上传和删除操作的时候,也把数组放入this.spuImageList属性中,此处可以不进行判断
       spuForm.spuImageList = spuForm.spuImageList || spuImageList;
 
       // 请求回来的图片对象
@@ -451,6 +455,7 @@ export default {
 
       spuForm.spuImageList = spuForm.spuImageList.map((imageObj)=>{
         if(imageObj.imgUrl){
+          // 用户之前上传好的图片
           delete imageObj.name;
           delete imageObj.url;
           return imageObj;
