@@ -64,7 +64,7 @@
             but:并不是说组件拆的越多越好,因为每个组件都会生成一个组件实例对象,很消耗性能
             标准:一般工作中以功能进行拆分,其次考虑性能(尽量避免一个组件状态和结构过多)
        -->
-      <SpuForm ref="spuForm" v-show="isShowSpuForm"></SpuForm>
+      <SpuForm ref="spuForm" @success="successSpuForm" :category3Id="category3Id" v-show="isShowSpuForm" :visible.sync="isShowSpuForm"></SpuForm>
       <SkuForm v-show="isShowSkuForm"></SkuForm>
     </el-card>
   </div>
@@ -138,12 +138,20 @@ export default {
       // 之后会显示出该组件
       //  间接请求数据(命令spuForm组件请求数据)
       // console.log(this.$refs.spuForm.spuForm)
-      this.$refs.spuForm.initUpdateSpuForm(row);
+      if(row.id){
+        this.$refs.spuForm.initUpdateSpuForm(row);
+      }else{
+        this.$refs.spuForm.initAddSpuForm();
+      }
     },
     // 用于显示SkuForm模块
     showSkuForm(){
       this.isShowSkuForm = true;
     },
+    // 用于观察spuform组件是否保存成功
+    successSpuForm(){
+      this.getSpuList();
+    }
   },
   computed:{
     isShowList(){

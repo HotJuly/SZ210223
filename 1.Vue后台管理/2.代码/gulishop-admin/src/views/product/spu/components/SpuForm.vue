@@ -47,16 +47,30 @@
       </el-form-item>
 
       <el-form-item label="销售属性">
-        <el-select v-model="spuSaleAttrStr" :placeholder="unUseSaleAttrList.length?`还有${unUseSaleAttrList.length}个未选中`:'没有了'">
-          <el-option 
-          v-for="unUseASaleAttr in unUseSaleAttrList"
-          :key="unUseASaleAttr.id"
-          :label="unUseASaleAttr.name" 
-          :value="`${unUseASaleAttr.name}:${unUseASaleAttr.id}`"
-          > </el-option>
+        <el-select
+          v-model="spuSaleAttrStr"
+          :placeholder="
+            unUseSaleAttrList.length
+              ? `还有${unUseSaleAttrList.length}个未选中`
+              : '没有了'
+          "
+        >
+          <el-option
+            v-for="unUseASaleAttr in unUseSaleAttrList"
+            :key="unUseASaleAttr.id"
+            :label="unUseASaleAttr.name"
+            :value="`${unUseASaleAttr.name}:${unUseASaleAttr.id}`"
+          >
+          </el-option>
         </el-select>
 
-        <el-button type="primary" icon="el-icon-plus" @click="addSaleAttr" :disabled="!spuSaleAttrStr">添加销售属性</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          @click="addSaleAttr"
+          :disabled="!spuSaleAttrStr"
+          >添加销售属性</el-button
+        >
 
         <el-table
           :data="spuForm.spuSaleAttrList"
@@ -68,7 +82,7 @@
           <el-table-column prop="saleAttrName" label="属性名" width="150">
           </el-table-column>
           <el-table-column label="属性值名称列表">
-            <template slot-scope="{row}">
+            <template slot-scope="{ row }">
               <!--                 @close="handleClose(tag)"
 -->
               <el-tag
@@ -77,12 +91,9 @@
                 closable
                 :disable-transitions="false"
               >
-                {{saleAttrValue.saleAttrValueName}}
+                {{ saleAttrValue.saleAttrValueName }}
               </el-tag>
 
-              <!-- 
-                @keyup.enter.native="handleInputConfirm"
-                 -->
               <el-input
                 class="input-new-tag"
                 v-if="row.inputVisible"
@@ -90,6 +101,7 @@
                 ref="saveTagInput"
                 size="small"
                 @blur="handleInputConfirm(row)"
+                @keyup.enter.native="handleInputConfirm(row)"
               >
               </el-input>
               <!-- 
@@ -101,18 +113,29 @@
                 @click="toEdit(row)"
                 >+ 添加</el-button
               >
-
             </template>
           </el-table-column>
           <el-table-column label="操作" width="150">
-            <template>
-              <HintButton type="danger" size="mini" icon="el-icon-delete" title="删除"></HintButton>
+            <template slot-scope="{ row, $index }">
+              <el-popconfirm
+                :title="`你确定要删除${row.saleAttrName}吗？`"
+                @onConfirm="deleteAttr($index)"
+              >
+                <!-- <HintButton @click.prevent="deleteAttr($index)" type="danger" size="mini" icon="el-icon-delete" title="删除"></HintButton> -->
+                <HintButton
+                  slot="reference"
+                  type="danger"
+                  size="mini"
+                  icon="el-icon-delete"
+                  title="删除"
+                ></HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
 
-        <el-button type="primary">保存</el-button>
-        <el-button>取消</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -169,6 +192,7 @@ export default {
       inputValue: "",
     };
   },
+  props: ["visible", "category3Id"],
   methods: {
     // 以下两个方法用于实现照片墙功能
     handleRemove(file, fileList) {
@@ -181,7 +205,7 @@ export default {
     },
     handlePictureCardPreview(file) {
       // file是当前的图片文件,本地的文件对象
-      console.log(file)
+      console.log(file);
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
@@ -192,6 +216,9 @@ export default {
       // ​     GET /admin/product/baseSaleAttrList
       // ​     2.获取所有的品牌信息(在**trademark**的api模块中声明)
       // ​     GET /admin/product/baseTrademark/getTrademarkList
+      
+      this.getBaseSaleAttrList();
+      this.getTradeMarks();
     },
     // 如果是修改SPU会执行该函数,请求相关数据
     initUpdateSpuForm(row) {
@@ -234,7 +261,7 @@ export default {
       //   spuId: 3;
       //   status: "success";
       //   uid: 1625811494042;
-      // 
+      //
       //   name:"xxxx.jpg",
       //   url:"xxxxx"
       // }
@@ -264,7 +291,7 @@ export default {
     },
 
     // 用于监视图片上传是否成功,成功会执行该回调函数
-    handleSuccess(response, file, fileList){
+    handleSuccess(response, file, fileList) {
       // response是当前上传接口返回的相应数据
       //file是当前图片对应的本地文件对象
       //fileList是当前照片墙展示的数组
@@ -272,54 +299,54 @@ export default {
       this.spuForm.spuImageList = fileList;
     },
     // 用于添加销售属性
-    addSaleAttr(){
+    addSaleAttr() {
       // 收集数据
-      const {spuSaleAttrStr} = this;
-      const [saleAttrName,baseSaleAttrId] = spuSaleAttrStr.split(':');
+      const { spuSaleAttrStr } = this;
+      const [saleAttrName, baseSaleAttrId] = spuSaleAttrStr.split(":");
 
       //整理数据结构
       // 我们手头只有ID,没有属性的属性名
       // {
-          //   baseSaleAttrId: 0,
-          //   saleAttrName: "",
-          //   spuSaleAttrValueList: [
-          //   ],
-          // },
+      //   baseSaleAttrId: 0,
+      //   saleAttrName: "",
+      //   spuSaleAttrValueList: [
+      //   ],
+      // },
       this.spuForm.spuSaleAttrList.push({
         saleAttrName,
         baseSaleAttrId,
-        spuSaleAttrValueList:[]
+        spuSaleAttrValueList: [],
       });
 
       // 记得清空spuSaleAttrStr的数据,防止显示错误
       this.spuSaleAttrStr = "";
     },
     // 监视用户点击添加属性值按钮,自动进入编辑模式
-    toEdit(row){
+    toEdit(row) {
       // row.inputVisible = true;
-      this.$set(row,"inputVisible",true);
+      this.$set(row, "inputVisible", true);
 
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         this.$refs.saveTagInput.focus();
-      })
+      });
     },
     // 监视输入框失去焦点,自动进入展示模式
-    handleInputConfirm(row){
-      const {inputValue} = row;
+    handleInputConfirm(row) {
+      const { inputValue } = row;
 
       // 属性值如果为空,提示用户
-      if(!inputValue.trim()){
-        this.$message.info('属性值不能为空,请注意!');
+      if (!inputValue.trim()) {
+        this.$message.info("属性值不能为空,请注意!");
         return;
       }
 
       //属性值如果重复,也提示用户
-      const isRepeat = row.spuSaleAttrValueList.some((item)=>{
-        return item.saleAttrValueName  === inputValue;
-      })
+      const isRepeat = row.spuSaleAttrValueList.some((item) => {
+        return item.saleAttrValueName === inputValue;
+      });
 
-      if(isRepeat){
-        this.$message.info('属性值已存在,添加失败!');
+      if (isRepeat) {
+        this.$message.info("属性值已存在,添加失败!");
         return;
       }
 
@@ -329,22 +356,141 @@ export default {
 
       // 将属性值对象推入对应的属性值列表中,用于动态渲染
       const obj = {
-        baseSaleAttrId: row.baseSaleAttrId, 
+        baseSaleAttrId: row.baseSaleAttrId,
         saleAttrValueName: row.inputValue,
-      }
+      };
 
       row.spuSaleAttrValueList.push(obj);
 
       // 清空row.inputValue数值,防止旧数据残留
       row.inputValue = "";
-    }
+    },
+    // 监视用户点击删除属性值按钮
+    deleteAttr($index) {
+      this.spuForm.spuSaleAttrList.splice($index, 1);
+    },
+    // 用于监视用户点击取消按钮操作
+    cancel() {
+      this.$emit("update:visible", false);
+      this.resetData();
+    },
+    // 用于重置当前组件状态
+    resetData() {
+      Object.assign(this.$data, this.$options.data());
+    },
+    // 用于监视用户点击保存按钮操作
+    async save() {
+      // {
+      //   category3Id: 0, //代表当前spu属于哪个分类,新增和修改都需要
+      //   description: "", //spu的描述文本
+      //   spuName: "", //spu的名称
+      //   tmId: "", //该属性代表spu的品牌ID,新增和修改都需要
+      //   // id: 0,                 //该属性代表的是spu的id,新增不需要,修改需要
+      //   spuImageList: [
+      //     //该属性对应图片列表功能,新增和修改都需要
+      //     // {
+      //     //   id: 0,
+      //     //   imgName: "string",
+      //     //   imgUrl: "string",
+      //     //   spuId: 0,
+      //     // },
+      //   ],
+      //   spuSaleAttrList: [
+      //     //该属性对应spu的销售属性列表,新增和修改都需要
+      //     // {
+      //     //   baseSaleAttrId: 0,
+      //     //   saleAttrName: "string",
+      //     //   spuSaleAttrValueList: [
+      //     //     {
+      //     //       baseSaleAttrId: 0,
+      //     //       saleAttrValueName: "string",
+      //     //     },
+      //     //   ],
+      //     // },
+      //   ],
+      // },
+      //1.收集数据
+      // 收集三级分类id,还有spuForm,以及之前请求的当前SPU所有图片列表(防止用户没有修改过列表数据)
+      const { category3Id, spuForm, spuImageList } = this;
+
+      //2.整理数据
+      //2.1 三级分类id
+      spuForm.category3Id = category3Id;
+
+      //2.2 图片列表数据处理
+      spuForm.spuImageList = spuForm.spuImageList || spuImageList;
+
+      // 请求回来的图片对象
+      // {
+      //   id: 1;
+      //   imgName: "2ff0882c9607e57c.jpg";
+      //   imgUrl: "http://47.93.148.192:8080/group1/M00/00/01/rBHu8l-rfvmAIpgZAAIvrX6L9fo612.jpg";
+      //   name: "2ff0882c9607e57c.jpg";
+      //   spuId: 1;
+      //   status: "success";
+      //   uid: 1625885180103;
+      //   url: "http://47.93.148.192:8080/group1/M00/00/01/rBHu8l-rfvmAIpgZAAIvrX6L9fo612.jpg";
+      // }
+
+      //上传成功的图片对象
+      // {
+      //   name: "钉钉的啊.png";
+      //   percentage: 100;
+      //   raw: File;
+      //   response: Object;
+      //   size: 124779;
+      //   status: "success";
+      //   uid: 1625885239094;
+      //   url: "blob:http://localhost:9528/2a8535d9-34de-47a4-a0ae-b70b6e8df5b7";
+      // }
+
+      // 发送请求需要的图片对象结构
+      // {
+      //       imgName: "string",
+      //       imgUrl: "string",
+      // }
+
+      spuForm.spuImageList = spuForm.spuImageList.map((imageObj)=>{
+        if(imageObj.imgUrl){
+          delete imageObj.name;
+          delete imageObj.url;
+          return imageObj;
+        }else{
+          return{
+            imgName: imageObj.name,
+            imgUrl: imageObj.response.data,
+          }
+        }
+      })
+
+      //2.3删除属性对象身上的多余属性(inputVisible和inputValue)
+      spuForm.spuSaleAttrList.forEach((item)=>{
+        delete item.inputVisible;
+        delete item.inputValue;
+      })
+
+      try {
+      //3.发送请求
+        await this.$API.spu.addOrUpdate(spuForm);
+      //4.成功做什么
+        this.$message.success('保存成功!');
+        // 隐藏当前SPUform组件
+        this.$emit("update:visible",false);
+        // 重置当前组件状态
+        this.resetData();
+        // 通知父组件,保存成功,可以请求最新列表了
+        this.$emit('success')
+      } catch (error) {
+      //5.失败做什么
+      }
+    },
   },
-  computed:{
-    unUseSaleAttrList(){
+  computed: {
+    unUseSaleAttrList() {
       // 获取总销售属性列表
-      const { spuSaleAttrList:baseSaleAttrList ,spuForm } = this;
+      const { spuSaleAttrList: baseSaleAttrList, spuForm } = this;
       // 当前spu拥有的所有销售属性
-      const {spuSaleAttrList} = spuForm;
+      const { spuSaleAttrList } = spuForm;
 
       // 去重,保留两个数组中不重复的部分
       // map(长度与基础数组一样) filter reduce
@@ -369,20 +515,19 @@ export default {
       const saleAttrObj = {};
 
       // 遍历较短的数组,将当前数组中出现的所有的销售属性的id存放到对象中,属性值为true
-      spuSaleAttrList.forEach((item)=>{
+      spuSaleAttrList.forEach((item) => {
         // obj[1]=true
         saleAttrObj[item.baseSaleAttrId] = true;
-      })
+      });
 
       // 遍历较长的数组,通过当前的属性id,去对象中读取数据,查看是否出现过
-      const unUseList = baseSaleAttrList.filter((item)=>{
-        return !saleAttrObj[item.id]
-      })
+      const unUseList = baseSaleAttrList.filter((item) => {
+        return !saleAttrObj[item.id];
+      });
 
       return unUseList;
-
-    }
-  }
+    },
+  },
   // mounted(){
   //   this.initUpdateSpuForm()
   // }
