@@ -29,12 +29,12 @@
     <el-form-item label="平台属性">
       <el-form label-width="80px" :inline="true">
         <el-form-item :label="attr.attrName" v-for="attr in attrList" :key="attr.id">
-          <el-select value="" placeholder="请选择">
+          <el-select v-model="attr.attrIdValueId" placeholder="请选择">
             <el-option 
             v-for="attrValue in attr.attrValueList"
             :key="attrValue.id"
             :label="attrValue.valueName" 
-            :value="attrValue.id"
+            :value="`${attr.id}:${attrValue.id}`"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -46,12 +46,12 @@
       <el-form label-width="80px" :inline="true">
 
         <el-form-item :label="spuSaleAttr.saleAttrName" v-for="spuSaleAttr in spuSaleAttrList" :key="spuSaleAttr.baseSaleAttrId">
-          <el-select value="" placeholder="请选择">
+          <el-select v-model="spuSaleAttr.attrIdValueId" placeholder="请选择">
             <el-option 
             v-for="spuSaleAttrValue in spuSaleAttr.spuSaleAttrValueList"
             :key="spuSaleAttrValue.id"
             :label="spuSaleAttrValue.saleAttrValueName" 
-            :value="spuSaleAttrValue.id"
+            :value="`${spuSaleAttr.baseSaleAttrId}:${spuSaleAttrValue.id}`"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -60,7 +60,7 @@
     </el-form-item>
 
     <el-form-item>
-      <el-table :data="spuImageList" style="width: 100%" border>
+      <el-table @selection-change="selectImage" :data="spuImageList" style="width: 100%" border>
         <el-table-column
           type="selection"
           width="55">
@@ -77,8 +77,9 @@
         </el-table-column>
         <el-table-column
           label="操作">
-          <template>
-            <el-button type="primary">设为默认值</el-button>
+          <template slot-scope="{row}">
+            <el-button type="primary" @click="changeDefault(row)" v-if="row.isDefault==='0'">设为默认值</el-button>
+            <el-tag :disable-transitions="true" type="success" v-else>默认</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -97,45 +98,58 @@ export default {
   data() {
     return {
       skuForm: {
+        //通过父组件传递下来,不需要我们收集
+        spuId:"",
+        tmId:"",
+        category3Id: 0,
+
+        //写静态样式通过v-model自动收集好了
         skuName: "",
         price: "",
         weight: "",
         skuDesc: "",
+        
+        // 需要手动收集
+        skuAttrValueList:[],
+        skuDefaultImg:"",
+        skuImageList:[],
+        skuSaleAttrValueList:[],
 
+        
         // category3Id: 0,
         // createTime: "2021-07-10T00:35:19.960Z",
         // id: 0,
         // isSale: 0,
         // skuAttrValueList: [
         //   {
-        //     attrId: 0,
-        //     attrName: "string",
-        //     id: 0,
-        //     skuId: 0,
-        //     valueId: 0,
-        //     valueName: "string",
+        //     attrId: 0,           需要
+        //     attrName: "string",  不需要
+        //     id: 0,               不需要
+        //     skuId: 0,            不需要
+        //     valueId: 0,          需要
+        //     valueName: "string", 不需要
         //   },
         // ],
         // skuDefaultImg: "string",
         // skuImageList: [
         //   {
-        //     id: 0,
-        //     imgName: "string",
-        //     imgUrl: "string",
-        //     isDefault: "string",
-        //     skuId: 0,
-        //     spuImgId: 0,
+        //     id: 0,               需要
+        //     imgName: "string",   需要
+        //     imgUrl: "string",    需要
+        //     isDefault: "string", 需要(如果不是默认图片,可以不传,默认图片为1,非默认为0)
+        //     skuId: 0,            不需要
+        //     spuImgId: 0,         需要
         //   },
         // ],
         // skuSaleAttrValueList: [
         //   {
-        //     id: 0,
-        //     saleAttrId: 0,
-        //     saleAttrName: "string",
-        //     saleAttrValueId: 0,
-        //     saleAttrValueName: "string",
-        //     skuId: 0,
-        //     spuId: 0,
+        //     id: 0,                       不需要
+        //     saleAttrId: 0,               需要
+        //     saleAttrName: "string",      不需要
+        //     saleAttrValueId: 0,          需要
+        //     saleAttrValueName: "string", 不需要
+        //     skuId: 0,                    不需要
+        //     spuId: 0,                    不需要
         //   },
         // ],
         // spuId: 0,
@@ -147,7 +161,8 @@ export default {
       category3Id:"",
       attrList:[],
       spuSaleAttrList:[],
-      spuImageList:[]
+      spuImageList:[],
+      selectedImageList:[]
     };
   },
   methods:{
@@ -177,11 +192,28 @@ export default {
 
       this.attrList = result[0].data;
       this.spuSaleAttrList = result[1].data;
-      this.spuImageList = result[2].data;
+      const imgList = result[2].data;
+      imgList.forEach((item)=>{
+        // 此处不需要使用$set,因为当前这个对象在变成响应式对象之前,就已经添加了isDefault属性
+          item.isDefault = "0"
+      })
+      this.spuImageList = imgList;
       // .then(()=>{
       //   // 更新三个数据
       // })
       // .catch(()=>{})
+    },
+    // 用于监视用户对图片列表的选择
+    selectImage(value){
+      // console.log('selectImage',value)
+      this.selectedImageList = value;
+    },
+    // 用于设置默认图片
+    changeDefault(row){
+      this.spuImageList.forEach((item)=>{
+        item.isDefault = "0"
+      })
+      row.isDefault="1";
     }
   }
 };
