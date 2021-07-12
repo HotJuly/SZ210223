@@ -231,7 +231,7 @@ export default {
       // 2.1父组件传下来的数据,进行传入
       skuForm.spuId = spuForm.id;
       skuForm.tmId = spuForm.tmId;
-      skuForm.tmId = category3Id;
+      skuForm.category3Id = category3Id;
 
       //2.2 平台属性收集(用户有进行选择的平台属性才进行收集)
       // reduce如果有第二个参数作为默认值,那么第一次循环的pre就是默认值
