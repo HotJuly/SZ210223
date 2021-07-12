@@ -43,6 +43,7 @@
                 size="mini"
                 icon="el-icon-info"
                 title="查看SKU列表"
+                @click="showSkuList(row)"
               ></HintButton>
               <el-popconfirm 
                 :title="`你确定要删除${row.spuName}？`"
@@ -101,6 +102,19 @@
         :visible.sync="isShowSkuForm"
       ></SkuForm>
     </el-card>
+
+  <el-dialog :title="`${spu.spuName}=>SKU列表`" :visible.sync="dialogTableVisible">
+    <el-table :data="skuList" border v-loading="!skuList.length">
+      <el-table-column label="名称" prop="skuName"></el-table-column>
+      <el-table-column label="价格(元)" prop="price"></el-table-column>
+      <el-table-column label="重量(千克)" prop="weight"></el-table-column>
+      <el-table-column label="默认图片">
+        <template slot-scope="{row}">
+          <img :src="row.skuDefaultImg" alt="" style="width:100px;height:100px" srcset="">
+        </template>
+      </el-table-column>
+    </el-table>
+  </el-dialog>
   </div>
 </template>
 
@@ -122,6 +136,9 @@ export default {
       spuList: [],
       isShowSpuForm: false,
       isShowSkuForm: false,
+      dialogTableVisible:false,
+      spu:{},
+      skuList:[]
     };
   },
   methods: {
@@ -213,6 +230,14 @@ export default {
       } catch (error) {
         this.$message.success('删除失败');
       }
+    },
+    // 用于监听用户点击查看SKU列表操作,展示dialog
+    async showSkuList(row){
+      this.dialogTableVisible = true;
+      this.spu = row;
+      const {data} = await this.$API.sku.getSkuList(row.id);
+      // console.log(result)
+      this.skuList = data;
     }
   },
   computed: {

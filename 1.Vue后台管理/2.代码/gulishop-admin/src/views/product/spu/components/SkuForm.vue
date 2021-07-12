@@ -86,8 +86,8 @@
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary">保存</el-button>
-      <el-button>取消</el-button>
+      <el-button type="primary" @click="save">保存</el-button>
+      <el-button @click="cancel">取消</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -193,9 +193,13 @@ export default {
       this.attrList = result[0].data;
       this.spuSaleAttrList = result[1].data;
       const imgList = result[2].data;
-      imgList.forEach((item)=>{
+      imgList.forEach((item,index)=>{
         // 此处不需要使用$set,因为当前这个对象在变成响应式对象之前,就已经添加了isDefault属性
+        if(index===0){
+          item.isDefault = "1"
+        }else{
           item.isDefault = "0"
+        }
       })
       this.spuImageList = imgList;
       // .then(()=>{
@@ -214,6 +218,83 @@ export default {
         item.isDefault = "0"
       })
       row.isDefault="1";
+
+      // 将当前选中的图片的url交给skuForm作为sku的默认图
+      this.skuForm.skuDefaultImg = row.imgUrl;
+    },
+    // 用于监视用户点击保存操作
+    async save(){
+      //1.收集数据
+      const {skuForm , spuForm , category3Id , attrList , spuSaleAttrList , selectedImageList} = this;
+
+      //2.整理数据格式
+      // 2.1父组件传下来的数据,进行传入
+      skuForm.spuId = spuForm.id;
+      skuForm.tmId = spuForm.tmId;
+      skuForm.tmId = category3Id;
+
+      //2.2 平台属性收集(用户有进行选择的平台属性才进行收集)
+      // reduce如果有第二个参数作为默认值,那么第一次循环的pre就是默认值
+      // reduce如果没有第二个参数作为默认值,那么第一次循环的pre就是数组中的第一项,而item就是第二项
+      skuForm.skuAttrValueList = attrList.reduce((pre,item)=>{
+        // 如果该数据有值,就说明用户选择过该属性
+        const attrIdValueId = item.attrIdValueId;
+        if(attrIdValueId){
+          const [attrId,valueId] = attrIdValueId.split(':');
+          const obj = {
+            attrId,
+            valueId
+          }
+          pre.push(obj);
+        }
+        return pre;
+      },[])
+
+      //2.3 销售属性收集(用户有进行选择的销售属性才进行收集)
+      skuForm.skuSaleAttrValueList = spuSaleAttrList.reduce((pre,item)=>{
+        // 如果该数据有值,就说明用户选择过该属性
+        const attrIdValueId = item.attrIdValueId;
+        if(attrIdValueId){
+          const [saleAttrId,saleAttrValueId] = attrIdValueId.split(':');
+          const obj = {
+            saleAttrId,
+            saleAttrValueId
+          }
+          pre.push(obj);
+        }
+        return pre;
+      },[])
+
+      //2.4 图片列表收集(用户选中的图片才进行收集)
+      skuForm.skuImageList = selectedImageList.map((item)=>{
+        return {        
+            imgName: item.imgName,   
+            imgUrl: item.imgUrl,    
+            isDefault: item.isDefault,
+            spuImgId: item.id,  //此处注意,item中具有两个id,此处需要的是当前图片id,而不是spuId       
+        }
+      })
+
+      try {
+      //3.发送请求
+      await this.$API.sku.addOrUpdate(skuForm);
+      //4.成功做什么
+      this.$message.success('添加SKU成功!!!');
+      this.$emit('update:visible',false);
+      // 此处不需要刷新spu的列表数据
+      this.resetData();
+
+      } catch (error) {
+      //5.失败做什么
+      this.$message.success('添加SKU失败!!!');
+      }
+    },
+    resetData(){
+      Object.assign(this.$data,this.$options.data());
+    },
+    cancel(){
+      this.$emit('update:visible',false);
+      this.resetData();
     }
   }
 };
