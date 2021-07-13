@@ -1,5 +1,5 @@
 <view class="indexContainer">
   <image class="avatarImg" src="../../static/images/nvsheng.jpg"></image>
-  <text class="username">华华想你</text>
+  <text class="username">华华{{msg}}</text>
   <button class="goStudy">欢迎来到尚硅谷</button>
 </view>
