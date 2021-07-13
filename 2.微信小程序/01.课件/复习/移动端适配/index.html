@@ -46,7 +46,13 @@
         // 获取当前屏幕宽度(由于无法直接获取到当前视觉视口宽度,所以先让布局视口和视觉视口等宽,在获取布局视口宽度)
         const width = document.documentElement.clientWidth;
         console.log(width)
+
+        // 该行代码执行结束,当前1rem等于屏幕百分之十的宽度
+        // rem适配只会影响到使用了rem单位的元素,对其他使用px的元素不会有任何影响
         document.documentElement.style.fontSize=width/10+"px";
+
+        // 因为字体大小会样式继承,如果不执行该行代码,会导致后面的样式发生重大变化
+        // 所以执行该代码,可以重置body内部的字体大小,重新变回默认值
         document.body.style.fontSize="16px"
     </script>
 </body>
