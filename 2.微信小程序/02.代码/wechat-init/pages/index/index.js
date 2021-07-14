@@ -12,7 +12,8 @@ Page({
     小程序之所以能够写成对象形式,是因为他底层做了JSON.parse(JSON.stringify(data)进行了深拷贝)
    */
   data: {
-    msg:"北鼻"
+    msg:"北鼻",
+    // userInfo:{}
   },
 
   handleTap(){
@@ -28,17 +29,29 @@ Page({
       url: '../log/log',
       // url: '/pages/log/log',
     })
-    },2000)
+    },0)
   },
 
   handleParent() {
     // console.log('handleParent')
   },
 
+  // 获取用户授权信息
+  getUserInfo(res){
+    // 框架想给回调函数传递数据一般就两个渠道:1.this 2.通过形参
+    // console.log('getUserInfo', res)
+    if (res.detail.rawData){
+      this.setData({
+        userInfo:res.detail.userInfo
+      })
+    }
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    debugger
     // console.log(111)
     // 说明小程序没有数据代理
     // this.msg="北鼻1"
