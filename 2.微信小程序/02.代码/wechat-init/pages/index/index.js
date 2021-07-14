@@ -1,4 +1,5 @@
 // pages/index/index.js
+// 此处在注册一个页面,注册页面可以多次注册
 Page({
 
   /**
@@ -12,6 +13,14 @@ Page({
    */
   data: {
     msg:"北鼻"
+  },
+
+  handleTap(){
+    console.log('handleTap')
+  },
+
+  handleParent() {
+    console.log('handleParent')
   },
 
   /**

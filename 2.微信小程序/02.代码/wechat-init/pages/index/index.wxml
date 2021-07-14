@@ -1,5 +1,14 @@
+<!-- 
+小程序中没有DOM,因为他不遵守W3C规范,所有的标签都是组件
+view相当于是html中的div 主要功能就是对页面结构进行划分
+text相当于html中的span  主要功能就是用于显示文本内容
+image相当于html中的img  主要功能就是显示图片,不过他的功能远多于img
+button相当于html中的button  主要功能就是显示按钮并点击
+ -->
 <view class="indexContainer">
   <image class="avatarImg" src="../../static/images/nvsheng.jpg"></image>
   <text class="username">华华{{msg}}</text>
-  <button class="goStudy">欢迎来到尚硅谷</button>
+  <view capture-catch:tap="handleParent">
+    <button class="goStudy" capture-bind:tap="handleTap">欢迎来到尚硅谷</button>
+  </view>
 </view>
