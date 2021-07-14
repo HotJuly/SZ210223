@@ -6,8 +6,13 @@ image相当于html中的img  主要功能就是显示图片,不过他的功能�
 button相当于html中的button  主要功能就是显示按钮并点击
  -->
 <view class="indexContainer">
-  <image class="avatarImg" src="{{userInfo.avatarUrl}}"></image>
-  <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">获取用户信息</button>
+  <!-- <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">获取用户信息</button> -->
+  
+  <!-- <image class="avatarImg" src="{{userInfo.avatarUrl}}"></image> -->
+  <!-- <button bindtap="getUserProfile">获取用户信息</button> -->
+
+  <open-data type="userAvatarUrl"></open-data>
+  <open-data type="userNickName"></open-data>
   <text class="username">{{userInfo.nickName}}{{msg}}</text>
   <view bindtap="handleParent">
     <button class="goStudy" bindtap="handleTap">欢迎来到尚硅谷</button>

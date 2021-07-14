@@ -47,11 +47,27 @@ Page({
     }
   },
 
+  // 用于获取用户授权信息(最新版)
+  getUserProfile() {
+    wx.getUserProfile({
+      desc: "用于测试接口",
+      success: (detail) => {
+        // console.log('success', detail)
+        this.setData({
+          userInfo: detail.userInfo
+        })
+      },
+      fail(){
+        console.log('fail')
+      }
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugger
+    // debugger
     // console.log(111)
     // 说明小程序没有数据代理
     // this.msg="北鼻1"
@@ -64,6 +80,16 @@ Page({
 
     // this.setData({ msg: "北鼻2" });
     // console.log('2', this.data.msg)
+
+    // 以下代码可以实现用户二次登陆免授权功能
+    // wx.getUserInfo({
+    //   success:(detail)=>{
+    //     // console.log('detail', detail)
+    //     this.setData({
+    //       userInfo: detail.userInfo
+    //     })
+    //   }
+    // })
   },
 
   /**
