@@ -8,7 +8,7 @@ button相当于html中的button  主要功能就是显示按钮并点击
 <view class="indexContainer">
   <image class="avatarImg" src="../../static/images/nvsheng.jpg"></image>
   <text class="username">华华{{msg}}</text>
-  <view capture-catch:tap="handleParent">
-    <button class="goStudy" capture-bind:tap="handleTap">欢迎来到尚硅谷</button>
+  <view bindtap="handleParent">
+    <button class="goStudy" bindtap="handleTap">欢迎来到尚硅谷</button>
   </view>
 </view>

@@ -16,29 +16,41 @@ Page({
   },
 
   handleTap(){
-    console.log('handleTap')
+    // console.log('handleTap')
+
+    this.setData({ msg: "北鼻2" });
+    setTimeout(() => {
+      // wx.navigateTo({
+      //   // url: '../log/log',
+      //   url: '/pages/log/log',
+      // })
+    wx.redirectTo({
+      url: '../log/log',
+      // url: '/pages/log/log',
+    })
+    },2000)
   },
 
   handleParent() {
-    console.log('handleParent')
+    // console.log('handleParent')
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log(111)
+    // console.log(111)
     // 说明小程序没有数据代理
     // this.msg="北鼻1"
     // 说明小程序没有数据劫持
     // this.data.msg="北鼻1";
 
     // 东抄一半西抄一半
-    this.setData({ msg: "北鼻1" });
-    console.log('1',this.data.msg)
+    // this.setData({ msg: "北鼻1" });
+    // console.log('1',this.data.msg)
 
-    this.setData({ msg: "北鼻2" });
-    console.log('2', this.data.msg)
+    // this.setData({ msg: "北鼻2" });
+    // console.log('2', this.data.msg)
   },
 
   /**
