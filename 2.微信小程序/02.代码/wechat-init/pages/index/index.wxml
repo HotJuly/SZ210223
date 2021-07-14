@@ -15,6 +15,6 @@ button相当于html中的button  主要功能就是显示按钮并点击
   <open-data type="userNickName"></open-data>
   <text class="username">{{userInfo.nickName}}{{msg}}</text>
   <view bindtap="handleParent">
-    <button class="goStudy" bindtap="handleTap">欢迎来到尚硅谷</button>
+    <button class="goStudy" bindtap="handleTap">欢迎来到{{city}}尚硅谷</button>
   </view>
 </view>

@@ -1,5 +1,6 @@
 // pages/index/index.js
 // 此处在注册一个页面,注册页面可以多次注册
+const citySelector = requirePlugin('citySelector');
 Page({
 
   /**
@@ -13,23 +14,32 @@ Page({
    */
   data: {
     msg:"北鼻",
+    city:""
     // userInfo:{}
   },
 
   handleTap(){
     // console.log('handleTap')
 
-    this.setData({ msg: "北鼻2" });
-    setTimeout(() => {
-      // wx.navigateTo({
-      //   // url: '../log/log',
-      //   url: '/pages/log/log',
-      // })
-    wx.redirectTo({
-      url: '../log/log',
-      // url: '/pages/log/log',
+    // this.setData({ msg: "北鼻2" });
+    // setTimeout(() => {
+    //   // wx.navigateTo({
+    //   //   // url: '../log/log',
+    //   //   url: '/pages/log/log',
+    //   // })
+    // wx.redirectTo({
+    //   url: '../log/log',
+    //   // url: '/pages/log/log',
+    // })
+    // },0)
+
+    const key = 'BZ7BZ-QQWCU-DHWV2-BFJJG-B2JZF-KSBT3'; // 使用在腾讯位置服务申请的key
+    const referer = '七月入栈'; // 调用插件的app的名称
+    const hotCitys = '北京,上海,深圳,武汉,泉州'; // 用户自定义的的热门城市
+
+    wx.navigateTo({
+      url: `plugin://citySelector/index?key=${key}&referer=${referer}&hotCitys=${hotCitys}`,
     })
-    },0)
   },
 
   handleParent() {
@@ -103,7 +113,13 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    const selectedCity = citySelector.getCity();
+    // console.log(selectedCity)
+    if (selectedCity) {
+      this.setData({
+        city: selectedCity.fullname
+      })
+    }
   },
 
   /**
