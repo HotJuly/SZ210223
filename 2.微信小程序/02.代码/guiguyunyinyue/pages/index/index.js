@@ -1,16 +1,18 @@
+import req from '../../utils/req.js';
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    
+    banners:[], //用于控制轮播图的显示
+    recommendList:[], //用于控制推荐歌曲区域的显示
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: async function (options) {
     /*
       1.在哪发?
         onLoad是最早的生命周期,就在这里发送
@@ -23,14 +25,67 @@ Page({
     // console.log("window", window);
     // console.log("wx", wx);
     // console.log(123)
-    wx.request({
-      url:"http://localhost:3000/banner",
-      data:{
-        type:2
-      },
-      method:"GET"
+    // wx.request({
+    //   url:"http://localhost:3000/banner",
+    //   data:{
+    //     type:2
+    //   },
+    //   method:"GET",
+    //   success:(res)=>{
+    //     // console.log(res)
+    //     const { data: { banners }} = res;
+    //     this.setData({
+    //       banners
+    //     })
+    //   }
+    // })
+
+    // const result =await req("/banner",{type:2});
+    // // console.log(result)
+    // const { banners } = result;
+    // this.setData({
+    //   banners
+    // })
+
+    req("/banner", { type: 2 })
+    .then(({ banners }) => {
+      this.setData({
+        banners
+      })
     })
+    
+
+
+    // wx.request({
+    //   url: "http://localhost:3000/personalized",
+    //   data: {
+    //   },
+    //   method: "GET",
+    //   success: (res) => {
+    //     // console.log(res)
+    //     const { data: { result: recommendList } } = res;
+    //     this.setData({
+    //       recommendList
+    //     })
+    //   }
+    // })
     // console.log(234)
+
+
+    // const result1 = await req("/personalized");
+    // // console.log(result)
+    // const { result: recommendList } = result1;
+    // this.setData({
+    //   recommendList
+    // })
+
+
+    req("/personalized")
+      .then(({ result: recommendList }) => {
+        this.setData({
+          recommendList
+        })
+      })
   },
 
   /**
