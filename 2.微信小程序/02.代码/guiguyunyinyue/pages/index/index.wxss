@@ -75,14 +75,45 @@
 /* header结束 */
 
 /* recommendContainer开始 */
+.recommendContainer{
+  padding:0 20rpx;
+}
+
 .recommendContainer .recommendScroll {
   display:flex;
+}
+
+.recommendContainer .recommendScroll .recommendItem{
+  width:200rpx;
+  margin-right:20rpx;
 }
 
 .recommendContainer .recommendScroll .recommendItem .recommendImg{
   width:200rpx;
   height:200rpx;
   border-radius: 20rpx;
+}
+
+.recommendContainer .recommendScroll .recommendItem .recommendName{
+  /* 
+    需求:单行文本溢出隐藏,并显示省略号
+      white-space:nowrap; 实现文本不换行
+      overflow:hidden;    实现溢出隐藏
+      text-overflow:ellipsis; 实现文本溢出样式的省略号
+  
+    需求:多行文本溢出隐藏,并显示省略号
+      display:-webkit-box;    开启webkit内核的盒模型
+      -webkit-line-clamp:2;   声明几行之后显示省略号
+      -webkit-box-orient:vertical;  声明文本的排列方向
+      overflow:hidden;    溢出隐藏内容
+   */
+   /* white-space:nowrap;
+   overflow:hidden;
+   text-overflow:ellipsis; */
+   display:-webkit-box;
+   -webkit-line-clamp:2;
+   -webkit-box-orient:vertical;
+   overflow:hidden;
 }
 
 /* recommendContainer结束 */
