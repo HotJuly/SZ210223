@@ -1,0 +1,24 @@
+前言:记得修改app.json中的pages数组的顺序,让个人中心处于第一位
+
+需求:当用户滑动屏幕时,需要让.cover-container元素跟着手指移动
+拆解:
+	1.当用户滑动屏幕时
+		绑定事件监听,事件名:touchmove
+	2.需要让.cover-container元素跟着手指移动
+		继续拆解:
+			1.如何让元素移动位置
+				margin
+				position	
+				transform		选定	transform: translateY(-100rpx);
+			2.如何知道手指的移动距离
+				手指的移动距离=手指当前位置-手指按下位置
+				手指当前位置:event.clientY
+				手指按下位置:event.clientY(但是需要绑定touchstart事件)
+需求:当用户手指放开时,需要让元素回到起点
+拆解:
+	1.当用户手指放开时
+		touchend
+	2.需要让元素回到起点
+		将状态中的moveDistance归零即可
+		
+				

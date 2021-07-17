@@ -5,7 +5,39 @@ Page({
    * 页面的初始数据
    */
   data: {
+    moveDistance:0,
+    moveTransition:""
+  },
 
+  handleTouchStart(event){
+    // touches数组用于记录当前屏幕上所有的手指
+    // changedTouches数组用于记录当前屏幕上所有正在变化的手指
+    // console.log('handleTouchStart', event.touches[0].clientY)
+    this.startY = event.touches[0].clientY;
+    // 为了防止用户第二次拖动元素,上一次的moveTransition未清空,导致样式不对
+    this.setData({
+      moveTransition:""
+    })
+  },
+
+  handleTouchMove(event) {
+    // console.log('handleTouchMove')
+    const moveY = event.touches[0].clientY
+    // console.log('moveY', moveY)
+    const moveDistance = moveY - this.startY;
+    // console.log('moveDistance', moveDistance)
+
+    if(moveDistance>80||moveDistance<0)return;
+    this.setData({
+      moveDistance
+    })
+  },
+
+  handleTouchEnd(){
+    this.setData({
+      moveDistance:0,
+      moveTransition:"transform  1s"
+    })
   },
 
   /**
