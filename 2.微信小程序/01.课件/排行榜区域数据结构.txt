@@ -1,0 +1,21 @@
+数据结构:
+[
+	{
+		name:"原创榜",
+		list:[
+			{
+				imgUrl:"xxxx.jpg",
+				topIndex:"1",
+				topName:"上山"
+			}
+		]
+	}
+]
+
+
+
+使用流程:
+1.使用最外层数组遍历产生4个swiper-item
+2.内部每个对象对应一个榜单的详细信息,其中需要榜单名称name,歌曲列表list
+3.通过list数组可以遍历出多条歌曲信息topItem元素
+4.每个对象都必须具有歌曲图片imgUrl,歌曲排名topIndex,歌曲名称topName

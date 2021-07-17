@@ -7,6 +7,7 @@ Page({
   data: {
     banners:[], //用于控制轮播图的显示
     recommendList:[], //用于控制推荐歌曲区域的显示
+    topList:[]  //用于控制排行榜区域显示
   },
 
   /**
@@ -47,6 +48,7 @@ Page({
     //   banners
     // })
 
+    // 请求获取轮播图列表数据
     req("/banner", { type: 2 })
     .then(({ banners }) => {
       this.setData({
@@ -80,12 +82,39 @@ Page({
     // })
 
 
+    // 请求获取推荐歌曲列表数据
     req("/personalized")
-      .then(({ result: recommendList }) => {
-        this.setData({
-          recommendList
-        })
+    .then(({ result: recommendList }) => {
+      this.setData({
+        recommendList
       })
+    });
+
+    // 请求获取排行榜数据  
+    const idxArr = [2,4,6,10];
+    const topList = [];
+    let i = 0;
+    while (i<idxArr.length) {
+      req("/top/list", { idx: idxArr[i++] })
+        .then(({ playlist }) => {
+          const obj = {};
+          obj.name = playlist.name;
+          obj.list = playlist.tracks.slice(0, 3);
+          obj.list = obj.list.map((item) => {
+            return {
+              imgUrl: item.al.picUrl,
+              topName: item.al.name
+            }
+          })
+          topList.push(obj);
+          // console.log(obj)
+          // 相当于每次请求成功都更新一次页面,也就是需要更新4次
+          this.setData({
+            topList
+          })
+        })
+    }
+    // console.log(topList)
   },
 
   /**

@@ -56,7 +56,7 @@
       wx:for="{{recommendList}}"
       wx:key="index"
       >
-        <image class="recommendImg" src="{{item.picUrl}}"></image>
+        <image lazy-load class="recommendImg" src="{{item.picUrl}}"></image>
         <view class="recommendName">
         {{item.name}}
         </view>
@@ -68,61 +68,20 @@
   <view class="topContainer">
     <NavHeader title="排行榜" moreTitle="热歌风向标"/>
     <swiper class="topSwiper" next-margin="50" snap-to-edge>
-      <swiper-item>
+      <swiper-item wx:for="{{topList}}" wx:key="name">
         <view class="topContent">
           <view class="title">
-            原创榜
+            {{item.name}}
           </view>
-          <view class="topItem">
-            <image class="topImg" src="/static/images/nvsheng.jpg"></image>
-            <text class="topNum">1</text>
-            <text class="topName">此去南京三千里此去南京三千里此去南京三千里此去南京三千里此去南京三千里此去南京三千里此去南京三千里此去南京三千里此去南京三千里</text>
-          </view>
-          <view class="topItem">
-            <image class="topImg" src="/static/images/nvsheng.jpg"></image>
-            <text class="topNum">1</text>
-            <text class="topName">此去南京三千里</text>
-          </view>
-          <view class="topItem">
-            <image class="topImg" src="/static/images/nvsheng.jpg"></image>
-            <text class="topNum">1</text>
-            <text class="topName">此去南京三千里</text>
-          </view>
-        </view>
-      </swiper-item>
-      <swiper-item>
-        <view class="topContent">
-          <view class="title">
-            原创榜
-          </view>
-          <view class="topItem">
-            <image class="topImg" src="/static/images/nvsheng.jpg"></image>
-            <text class="topNum">1</text>
-            <text class="topName">此去南京三千里</text>
-          </view>
-        </view>
-      </swiper-item>
-      <swiper-item>
-        <view class="topContent">
-          <view class="title">
-            原创榜
-          </view>
-          <view class="topItem">
-            <image class="topImg" src="/static/images/nvsheng.jpg"></image>
-            <text class="topNum">1</text>
-            <text class="topName">此去南京三千里</text>
-          </view>
-        </view>
-      </swiper-item>
-      <swiper-item>
-        <view class="topContent">
-          <view class="title">
-            原创榜
-          </view>
-          <view class="topItem">
-            <image class="topImg" src="/static/images/nvsheng.jpg"></image>
-            <text class="topNum">1</text>
-            <text class="topName">此去南京三千里</text>
+          <view class="topItem" 
+          wx:for="{{item.list}}" 
+          wx:key="imgUrl"
+          wx:for-item="topItem"
+          wx:for-index="topIndex"
+          >
+            <image lazy-load class="topImg" src="{{topItem.imgUrl}}"></image>
+            <text class="topNum">{{topIndex + 1}}</text>
+            <text class="topName">{{topItem.topName}}</text>
           </view>
         </view>
       </swiper-item>
