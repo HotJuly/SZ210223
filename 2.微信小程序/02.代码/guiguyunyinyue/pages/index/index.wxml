@@ -67,7 +67,7 @@
 
   <view class="topContainer">
     <NavHeader title="排行榜" moreTitle="热歌风向标"/>
-    <swiper class="topSwiper" next-margin="50">
+    <swiper class="topSwiper" next-margin="50" snap-to-edge>
       <swiper-item>
         <view class="topContent">
           <view class="title">
