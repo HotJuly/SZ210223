@@ -9,6 +9,12 @@ Page({
     moveTransition:""
   },
 
+  toLogin(){
+    wx.navigateTo({
+      url:"/pages/login/login"
+    })
+  },
+
   handleTouchStart(event){
     // touches数组用于记录当前屏幕上所有的手指
     // changedTouches数组用于记录当前屏幕上所有正在变化的手指
