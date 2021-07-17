@@ -21,6 +21,7 @@ export default function(url,data={},method="GET"){
       method,
       success: (res) => {
         // result = res;
+        // 将响应体数据返回出去
         resolve(res.data)
         // console.log(res)
         // const { data: { banners } } = res;
