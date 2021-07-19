@@ -24,9 +24,24 @@ export default function(url,data={},method="GET"){
       url: config.mpHost + url,
       data,
       method,
+      header:{
+        // 项目初始化之后,一开始应该是没有cookie数据的,所以此处会是空
+        // 只有等用户登录过之后,此处才会有数据
+        Cookie:wx.getStorageSync('cookie')
+      },
       success: (res) => {
         // result = res;
         // 将响应体数据返回出去
+        // 第二次回来了,当我们准备请求video页面数据的时候,发现需要使用到响应头中的cookie
+        // 存储cookie的条件是什么?必须是登录接口的cookie才保存
+        // 1.当发送登录请求的时候,在data中创建isLogin属性,用于声明当前接口是登录接口
+        // 2.在成功回调中,通过isLogin属性判断是否要保存当前请求的cookie
+        if (data.isLogin) {
+          // console.log('res', res)
+          wx.setStorageSync("cookie",res.cookies.find((item)=>{
+            return item.startsWith('MUSIC_U');
+          }))
+        }
         resolve(res.data)
         // console.log(res)
         // const { data: { banners } } = res;

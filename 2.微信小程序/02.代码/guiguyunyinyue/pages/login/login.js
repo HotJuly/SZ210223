@@ -39,7 +39,7 @@ Page({
 
     // 2.整理数据
     // 小程序的request,如果发现是GET请求,会自动将data的数据拼接成query传参
-    const query = {phone,password};
+    const query = {phone,password,isLogin:true};
 
     // 3.发送请求
     // url:/login/cellphone?phone=xxx&password=yyy
@@ -49,6 +49,7 @@ Page({
         3.验证通过 200
     */
     const result = await req('/login/cellphone', query);
+    console.log('login', result)
 
     // 4.成功做什么
     if(result.code === 200){
