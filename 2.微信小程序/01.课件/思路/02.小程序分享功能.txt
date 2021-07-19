@@ -1,0 +1,10 @@
+想要实现分享功能,一共有两种渠道
+1.通过小程序右上角的转发按钮,可以弹出分享窗口
+2.通过button组件实现弹出分享窗口
+
+触发弹窗效果有两个渠道,但是都会触发一个监听回调
+就是每个页面的onShareAppMessage
+
+    // from代表的是触发当前回调函数的来源
+    // target代表的是平常点击事件中的event.currentTarget
+    //可以通过在onShareAppMessage回调函数中,return一个对象,可以自定义转发内容
