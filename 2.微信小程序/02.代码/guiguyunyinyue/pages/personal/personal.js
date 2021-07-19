@@ -6,13 +6,17 @@ Page({
    */
   data: {
     moveDistance:0,
-    moveTransition:""
+    moveTransition:"",
+    userInfo:{}
   },
 
   toLogin(){
-    wx.navigateTo({
-      url:"/pages/login/login"
-    })
+    // 判断用户是否登录,如果已经登录就禁止前往登录界面
+    if (!this.data.userInfo.nickname) {
+      wx.navigateTo({
+        url: "/pages/login/login"
+      })
+    }
   },
 
   handleTouchStart(event){
@@ -64,7 +68,15 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    // 获取用户信息
+    const userInfoStr = wx.getStorageSync("userInfo");
+    // console.log('userInfoStr', userInfoStr);
+    if (userInfoStr) {
+      const userInfo = JSON.parse(userInfoStr);
+      this.setData({
+        userInfo
+      })
+    }
   },
 
   /**
