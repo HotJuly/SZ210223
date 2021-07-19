@@ -1,3 +1,4 @@
+
 // pages/video/video.js
 import req from '../../utils/req.js';
 Page({
@@ -9,6 +10,34 @@ Page({
     navList:[],
     currentId:"",
     videoList:[]
+  },
+  //用于练习,测试控制视频暂停播放API
+  testAPI(){
+    // console.log('testAPI')
+    // 1.根据当前的video组件的id,生成对应的上下文对象,用于操作对应的video组件
+    const videoContext = wx.createVideoContext("vid0");
+    // 2.调用对应API,可以操作对应的video组件
+    videoContext.pause();
+  },
+
+  // 用于监视视频的播放操作
+  handlePlay(event){
+    // console.log('handlePlay')
+    // console.log('this.oldVId', this.oldVId)
+    const { id } = event.currentTarget;
+
+    //判断条件有两个
+    // 1.判断是否有值,是为了防止第一次播放,没有上一个视频,会报错
+    // 2.判断当前id和上一个视频id是否相同,相同就不暂停
+    if (this.oldVId && this.oldVId !== id) {
+      // 1.根据当前的video组件的id,生成对应的上下文对象,用于操作对应的video组件
+      const videoContext = wx.createVideoContext(this.oldVId);
+      // 2.调用对应API,可以操作对应的video组件
+      videoContext.pause();
+    }
+
+    // 获取当前vid,并保存起来
+    this.oldVId = id;
   },
 
   // 用于请求视频列表数据
