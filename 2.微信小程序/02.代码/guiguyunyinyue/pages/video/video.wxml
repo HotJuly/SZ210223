@@ -28,12 +28,24 @@
     wx:for="{{videoList}}"
     wx:key="vid"
     >
+
       <video 
+      wx:if="{{playVId === item.vid}}"
       id="{{item.vid}}"
       class="common" 
       src="{{item.urlInfo.url}}"
       bindplay="handlePlay"
       ></video>
+      
+      <image 
+      wx:else
+      id="{{item.vid}}"
+      src="{{item.coverUrl}}"
+      class="common" 
+      data-vid="{{item.vid}}"
+      bindtap="switchVideo"></image>
+
+
       <view class="content">{{item.title}}</view>
       <view class="footer">
         <image class="avatar" src="{{item.creator.avatarUrl}}"></image>

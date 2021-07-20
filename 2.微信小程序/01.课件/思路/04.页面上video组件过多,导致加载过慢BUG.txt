@@ -1,0 +1,15 @@
+问题:由于当前页面的video组件太多,而video组件只要具有src属性,会立马请求资源,导致网速不够,视频播放卡顿
+解决:不建议同个页面使用多个video组件，建议不超过3个video，如果要实现video列表功能，请进行优化（image列表，选中时将image替换成video）
+需求:当用户点击image组件时,显示对应的video组件并播放视频
+拆解:
+	1.当用户点击image组件时
+		绑定事件监听->事件名:tap||touchstart||touchend
+	2.显示对应的video组件并自动播放视频
+		继续拆解:
+			1.如何切换image组件和video组件之间的显示
+				可以通过某个状态数据去控制显示内容
+				在data中声明playVId用于记录当前准备显示的视频id,用于切换image组件和video组件
+			2.如何知道当前image组件和哪个video组件是对应的
+				可以通过标签属性id去找到对应的video组件
+			3.如何自动播放视频
+				通过js控制video组件播放视频

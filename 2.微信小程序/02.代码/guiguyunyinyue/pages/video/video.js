@@ -9,8 +9,33 @@ Page({
   data: {
     navList:[],
     currentId:"",
-    videoList:[]
+    videoList:[],
+    playVId:""
   },
+
+  // 用于监视用户对image组件的点击操作,用于切换对应的video组件
+  switchVideo(event){
+    // 一.通过状态来显示对应的video组件
+    // 1.通过自定义属性将当前的vid传入当前事件内部
+    // 2.通过更新状态来显示对应的video组件
+    // 扩展:由于小程序的setData更新数据是同步的,但是更新视图是异步的,而当前我们需要确保video组件更新出来之后,才进行播放操作,所以可以在setData调用中,传入第二个实参,数据类型为函数,这个函数会在视图更新之后才会执行(类似于Vue中的vm.$nextTick)
+    const {vid} = event.currentTarget.dataset;
+    this.setData({
+      playVId:vid
+    },()=>{
+      const videoContext = wx.createVideoContext(vid);
+      videoContext.play();
+    })
+
+
+    // 二.通过js控制video组件播放视频
+    // 1.获取到对应的video组件的上下文对象
+    // 2.调用API播放video视频(播放的API是play方法)
+    // console.log('switchVideo');
+    // const videoContext = wx.createVideoContext(vid);
+    // videoContext.play();
+  },
+
   //用于练习,测试控制视频暂停播放API
   testAPI(){
     // console.log('testAPI')

@@ -17,6 +17,7 @@
 
  */
 import config from './config.js';
+let cookie = wx.getStorageSync('cookie');
 
 export default function(url,data={},method="GET"){
   return new Promise((resolve,reject) => {
@@ -27,7 +28,7 @@ export default function(url,data={},method="GET"){
       header:{
         // 项目初始化之后,一开始应该是没有cookie数据的,所以此处会是空
         // 只有等用户登录过之后,此处才会有数据
-        Cookie:wx.getStorageSync('cookie')
+        cookie
       },
       success: (res) => {
         // result = res;
@@ -38,9 +39,21 @@ export default function(url,data={},method="GET"){
         // 2.在成功回调中,通过isLogin属性判断是否要保存当前请求的cookie
         if (data.isLogin) {
           // console.log('res', res)
-          wx.setStorageSync("cookie",res.cookies.find((item)=>{
+
+          //现在这种写法一共将cookie保存两份,
+          // 保存在硬盘中是为了用户下次开启项目使用
+          // 保存在内存中是为了当前本次运行项目使用,因为内存的性能优于硬盘读写的性能
+
+          //此操作是将cookie保存到硬盘中
+          // 类似于gulishop中的将token存放到localStorage中
+          const c1 = res.cookies.find((item) => {
             return item.startsWith('MUSIC_U');
-          }))
+          });
+          wx.setStorageSync("cookie", c1);
+
+          // 此操作是将cookie存放到内存中
+          // 类似于gulishop中的将token存放到Vuex中
+          cookie = c1;
         }
         resolve(res.data)
         // console.log(res)
