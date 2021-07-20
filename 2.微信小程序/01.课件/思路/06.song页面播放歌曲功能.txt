@@ -1,0 +1,18 @@
+需求:当用户点击播放按钮时,自动播放音乐
+拆解需求:
+	1.当用户点击播放按钮时
+		绑定事件监听,事件名:tap||touchstart
+	2.自动播放音乐
+    		//  1.生成全局唯一的背景音频管理器
+   		 const backgroundAudioManager = wx.getBackgroundAudioManager();
+
+    		//  2.输入src/title,告知即将播放的音频链接,标题
+    		// 注意:此处官方文档只说需要src,但实际上还需要title,否则无法自动播放
+    		backgroundAudioManager.src = this.data.musicUrl;
+    		backgroundAudioManager.title = this.data.songObj.name;
+
+问题:当用户点击播放按钮时,
+	如果正处于播放状态,就暂停播放,
+	如果处于暂停状态,进进入播放状态
+	通过data中的isplay属性,控制页面的c3效果,同时用来记录页面的播放状态
+	可以通过该属性去辨别应该播放还是暂停

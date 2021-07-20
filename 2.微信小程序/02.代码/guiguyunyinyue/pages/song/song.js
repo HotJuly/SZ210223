@@ -6,7 +6,40 @@ Page({
    * 页面的初始数据
    */
   data: {
-    songObj:{}
+    songObj:{},
+    musicUrl:"",
+    isplay:false
+  },
+  
+  //用于监视用户对播放按钮的点击操作,用于控制音乐播放
+  handlePlay(){
+    // console.log('handlePlay')
+
+    // 播放对应的歌曲
+    //  1.生成全局唯一的背景音频管理器
+    const backgroundAudioManager = wx.getBackgroundAudioManager();
+
+    // 需要判断当前页面的播放状态
+    if(this.data.isplay){
+      // 只有当前页面正处于播放状态,才能进入此处
+      // 进入之后需要暂停当前音频
+      backgroundAudioManager.pause(); 
+    } else {
+      // 只有当前页面正处于暂停状态,才能进入此处
+      // 进入之后需要播放当前音频
+
+
+      //  2.输入src/title,告知即将播放的音频链接,标题
+      // 注意:此处官方文档只说需要src,但实际上还需要title,否则无法自动播放
+      backgroundAudioManager.src = this.data.musicUrl;
+      backgroundAudioManager.title = this.data.songObj.name;
+
+    }
+
+    // 让页面播放的C3效果停下来或者冻起来
+    this.setData({
+      isplay: !this.data.isplay
+    })
   },
 
   /**
@@ -31,6 +64,12 @@ Page({
 
     this.setData({
       songObj
+    })
+
+    const urlInfo = await req('/song/url', { id: songId});
+    // console.log('urlInfo', urlInfo)
+    this.setData({
+      musicUrl: urlInfo.data[0].url
     })
   },
 
