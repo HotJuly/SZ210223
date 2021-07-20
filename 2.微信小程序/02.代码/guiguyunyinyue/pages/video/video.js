@@ -144,6 +144,33 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: async function () {
+    // 当用户进入video页面,检查用户是否登录,如果没有登录就弹出模态对话框
+    const cookie = wx.getStorageSync('cookie');
+    if (!cookie){
+      wx.showModal({
+        title:"请先登录",
+        content:"该功能需要登录帐号",
+        cancelText:"回到首页",
+        confirmText:"去登陆",
+        success({confirm,cancel}){
+          // 无论用户点击确定还是取消都会触发当前的回调函数
+          if (confirm){
+            // 用户点击确定之后会进入当前区域
+            wx.navigateTo({
+              url: '/pages/login/login',
+            })
+          } else {
+            // 用户点击取消之后会进入当前区域
+            wx.switchTab({
+              url:"/pages/index/index"
+            })
+          }
+          // console.log('success', confirm, cancel)
+        }
+      })
+      return;
+    }
+
     // 请求导航列表数据
     const { data } = await req('/video/group/list');
     this.setData({
