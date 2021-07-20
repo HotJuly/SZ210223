@@ -22,7 +22,14 @@
   </scroll-view>
 
   <!-- videoList区域 -->
-  <scroll-view class="videoList" scroll-y>
+  <scroll-view 
+  class="videoList" 
+  scroll-y
+  refresher-enabled
+  refresher-triggered="{{isTriggered}}"
+  bindrefresherrefresh="handlePullDownRefresh"
+  bindscrolltolower="handleScrollToLower"
+  >
     <view 
     class="videoItem"
     wx:for="{{videoList}}"
@@ -36,7 +43,7 @@
       src="{{item.urlInfo.url}}"
       bindplay="handlePlay"
       ></video>
-      
+
       <image 
       wx:else
       id="{{item.vid}}"

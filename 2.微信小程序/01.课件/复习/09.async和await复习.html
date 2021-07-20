@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // await之后的代码,都相当于放在了then回调中
+        // async函数返回值一定是一个新的promise对象(是pending状态)
+        // async内部的return的东西,会作为返回的promise的value值存在
+
+
+        // async函数的返回值如果不是一个promise对象:
+        // async函数中如果出现错误,导致代码无法全部执行结束,返回的就是失败的promise
+        // async函数中如果代码全部执行结束,返回的就是成功的promise
+
+        // async函数的return如果是一个promise对象:
+        // async函数中返回的promise状态将会跟return的那个一样
+        var p1;
+        async function a(){
+            console.log(1)
+            await new Promise((resolve)=>{
+                console.log(2)
+                setTimeout(()=>{
+                    console.log(3)
+                    resolve();
+                },1000)
+                console.log(4)
+                // console.log(c)
+            })
+            console.log(5)
+            // p1 = Promise.reject();
+            // return p1;
+        }
+
+        const b = a();
+        console.log('b',b,b===p1)
+    </script>
+</body>
+</html>

@@ -10,7 +10,27 @@ Page({
     navList:[],
     currentId:"",
     videoList:[],
-    playVId:""
+    playVId:"",
+    isTriggered:false
+  },
+
+  // 用于监视用户上拉videoList列表触底操作,获取更多数据
+  handleScrollToLower(){
+    // console.log('handleScrollToLower')
+    setTimeout(()=>{
+      this.setData({
+        videoList: [...this.data.videoList, ...this.data.videoList]
+      })
+    },1000)
+  },
+
+  // 用于监视用户下拉videoList列表操作,获取最新数据
+  async handlePullDownRefresh(){
+    // console.log('handlePullDownRefresh')
+    await this.getVideoList();
+    this.setData({
+      isTriggered:false
+    })
   },
 
   // 用于监视用户对image组件的点击操作,用于切换对应的video组件
@@ -154,7 +174,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
+    console.log('onPullDownRefresh')
   },
 
   /**
