@@ -1,5 +1,8 @@
 // pages/song/song.js
 import req from '../../utils/req.js';
+
+// 获取到全局唯一的小程序实例
+const appInstance = getApp();
 Page({
 
   /**
@@ -7,8 +10,33 @@ Page({
    */
   data: {
     songObj:{},
+    songId:"",
     musicUrl:"",
     isplay:false
+  },
+
+  // 用于绑定背景音频管理器相关事件
+  addEvent(){
+
+    this.backgroundAudioManager.onPlay(() => {
+      // console.log('onPlay')
+
+      // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
+      appInstance.globalData.playState = true;
+
+      this.setData({
+        isplay: true
+      })
+    })
+
+    this.backgroundAudioManager.onPause(() => {
+      // console.log('onPause')
+      // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
+      appInstance.globalData.playState = false;
+      this.setData({
+        isplay: false
+      })
+    })
   },
   
   //用于监视用户对播放按钮的点击操作,用于控制音乐播放
@@ -17,13 +45,16 @@ Page({
 
     // 播放对应的歌曲
     //  1.生成全局唯一的背景音频管理器
-    const backgroundAudioManager = wx.getBackgroundAudioManager();
+    // const backgroundAudioManager = wx.getBackgroundAudioManager();
 
     // 需要判断当前页面的播放状态
     if(this.data.isplay){
       // 只有当前页面正处于播放状态,才能进入此处
       // 进入之后需要暂停当前音频
-      backgroundAudioManager.pause(); 
+      this.backgroundAudioManager.pause();
+
+      // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
+      appInstance.globalData.playState = false;
     } else {
       // 只有当前页面正处于暂停状态,才能进入此处
       // 进入之后需要播放当前音频
@@ -31,9 +62,13 @@ Page({
 
       //  2.输入src/title,告知即将播放的音频链接,标题
       // 注意:此处官方文档只说需要src,但实际上还需要title,否则无法自动播放
-      backgroundAudioManager.src = this.data.musicUrl;
-      backgroundAudioManager.title = this.data.songObj.name;
+      this.backgroundAudioManager.src = this.data.musicUrl;
+      this.backgroundAudioManager.title = this.data.songObj.name;
 
+      // 使用小程序唯一的实例，记录当前背景音频管理器正在播放的歌曲id
+      appInstance.globalData.audioId = this.data.songId;
+      // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
+      appInstance.globalData.playState = true;
     }
 
     // 让页面播放的C3效果停下来或者冻起来
@@ -63,7 +98,8 @@ Page({
     });
 
     this.setData({
-      songObj
+      songObj,
+      songId
     })
 
     const urlInfo = await req('/song/url', { id: songId});
@@ -71,6 +107,27 @@ Page({
     this.setData({
       musicUrl: urlInfo.data[0].url
     })
+
+    // 读取数据的方法和普通对象相同
+    // 修改数据的方法和普通对象相同
+    // 属性名可以任意取,没有任何限制
+    // 总结:他就是普通对象
+    // console.log(1,appInstance.globalData.msg)
+    // appInstance.globalData.msg = "我是修改之后的数据"
+    // console.log(2, appInstance.globalData.msg)
+
+    // 判断背景音频是否正在播放
+    // 判断两首歌是不是同一首歌
+    const {audioId,playState} = appInstance.globalData;
+    if (playState&&songId===audioId){
+      this.setData({
+        isplay:true
+      })
+    }
+
+    // 绑定背景音频管理器相关的事件监听
+    this.backgroundAudioManager = wx.getBackgroundAudioManager();
+    this.addEvent();
   },
 
   /**
