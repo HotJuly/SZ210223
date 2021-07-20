@@ -39,10 +39,15 @@ Page({
     // 1.通过自定义属性将当前的vid传入当前事件内部
     // 2.通过更新状态来显示对应的video组件
     // 扩展:由于小程序的setData更新数据是同步的,但是更新视图是异步的,而当前我们需要确保video组件更新出来之后,才进行播放操作,所以可以在setData调用中,传入第二个实参,数据类型为函数,这个函数会在视图更新之后才会执行(类似于Vue中的vm.$nextTick)
+
+
+    // 注意:image组件上的id和data-vid都是为了向当前函数内部进行传参使用,选一者即可
+    // video组件的id是因为后续需要创建video上下文,操作当前video组件,小程序官方要求,必须要有
     const {vid} = event.currentTarget.dataset;
     this.setData({
       playVId:vid
     },()=>{
+      // wx.createVideoContext(组件标签的id属性)
       const videoContext = wx.createVideoContext(vid);
       videoContext.play();
     })

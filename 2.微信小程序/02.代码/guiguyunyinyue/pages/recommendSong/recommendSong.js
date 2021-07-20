@@ -11,6 +11,20 @@ Page({
     recommendList:[]
   },
 
+  //监视用户点击歌曲选项,跳转到song页面
+  toSong(event){
+    const {songid} = event.currentTarget.dataset;
+    // console.log('song', song)
+    // 需要获取到当前选项对应的歌曲对象
+    // 注意:此方法失败,因为url有长度限制,song对象太大了
+    // wx.navigateTo({
+    //   url: '/pages/song/song?song='+ JSON.stringify(song),
+    // })
+    wx.navigateTo({
+      url: '/pages/song/song?songId=' + songid,
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
