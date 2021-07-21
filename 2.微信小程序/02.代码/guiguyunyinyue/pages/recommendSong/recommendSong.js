@@ -1,4 +1,5 @@
 // pages/recommendSong/recommendSong.js
+import PubSub from 'pubsub-js';
 import req from '../../utils/req.js';
 Page({
 
@@ -8,18 +9,22 @@ Page({
   data: {
     month:"--",
     day:"--",
-    recommendList:[]
+    recommendList:[],
+    currentIndex:null
   },
 
   //监视用户点击歌曲选项,跳转到song页面
   toSong(event){
-    const {songid} = event.currentTarget.dataset;
+    const {songid,index} = event.currentTarget.dataset;
     // console.log('song', song)
     // 需要获取到当前选项对应的歌曲对象
     // 注意:此方法失败,因为url有长度限制,song对象太大了
     // wx.navigateTo({
     //   url: '/pages/song/song?song='+ JSON.stringify(song),
     // })
+    this.setData({
+      currentIndex: index
+    })
     wx.navigateTo({
       url: '/pages/song/song?songId=' + songid,
     })
@@ -73,6 +78,37 @@ Page({
     // console.log(result)
     this.setData({
       recommendList: result.recommend.slice(0,15)
+    })
+
+    // 订阅消息,用于接收song页面发过来的用户操作的按钮(需要找的歌曲是上一首还是下一首)
+    PubSub.subscribe('switchType',(msg,data)=>{
+      // console.log('switchType', msg, data)
+      let { currentIndex, recommendList} = this.data;
+      if(data==="next"){
+        // 能进入这里说明用户点击了下一首
+        if(currentIndex===recommendList.length-1){
+          // 如果当前已经是最后一首歌,就回到列表的第一首歌去
+          currentIndex=0;
+        } else {
+          currentIndex += 1;
+        }
+      }else{
+        // 能进入这里说明用户点击了上一首
+        if(currentIndex===0){
+          // 如果当前已经是第一首歌,就回到列表的最后一首歌去
+          currentIndex= recommendList.length-1;
+        } else {
+          currentIndex -= 1;
+        }
+      }
+      // 通过下标找到对应歌曲的id
+      const id = recommendList[currentIndex].id;
+      this.setData({
+        currentIndex
+      })
+
+      // 将歌曲id发送给song页面
+      PubSub.publish('sendId',id);
     })
   },
 

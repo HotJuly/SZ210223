@@ -1,4 +1,5 @@
 // pages/song/song.js
+import PubSub from 'pubsub-js';
 import req from '../../utils/req.js';
 
 // 获取到全局唯一的小程序实例
@@ -15,9 +16,41 @@ Page({
     isplay:false
   },
 
+  // 用于请求当前songid对应的歌曲详细信息
+  async getMusicDetail(){
+    //发送请求获取歌曲详细信息
+    const result = await req('/song/detail', { ids: this.data.songId });
+    const songObj = result.songs[0];
+    // console.log(result)
+    // 动态设置当前页面的导航栏标题
+    wx.setNavigationBarTitle({
+      title: songObj.name
+    });
+
+    this.setData({
+      songObj
+    })
+  },
+
+  // 用于监视用户点击上一首/下一首按钮操作,自动切换对应歌曲并播放
+  switchSong(event){
+    console.log('switchSong')
+    PubSub.subscribe('sendId',(msg,songId)=>{
+      // console.log('data', data)
+      this.setData({
+        songId
+      });
+      this.getMusicDetail();
+    })
+
+    const {id} = event.currentTarget;
+    PubSub.publish('switchType', id);
+  },
+
   // 用于绑定背景音频管理器相关事件
   addEvent(){
 
+    // 用于监视背景音频开始播放事件
     this.backgroundAudioManager.onPlay(() => {
       // console.log('onPlay')
 
@@ -29,6 +62,7 @@ Page({
       })
     })
 
+    // 用于监视背景音频暂停事件
     this.backgroundAudioManager.onPause(() => {
       // console.log('onPause')
       // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
@@ -88,19 +122,23 @@ Page({
     // 获取对应的歌曲id
     const {songId} = options;
 
-    //发送请求获取歌曲详细信息
-    const result = await req('/song/detail', { ids: songId });
-    const songObj = result.songs[0];
-    // console.log(result)
-    // 动态设置当前页面的导航栏标题
-    wx.setNavigationBarTitle({
-      title: songObj.name
-    });
+    // //发送请求获取歌曲详细信息
+    // const result = await req('/song/detail', { ids: songId });
+    // const songObj = result.songs[0];
+    // // console.log(result)
+    // // 动态设置当前页面的导航栏标题
+    // wx.setNavigationBarTitle({
+    //   title: songObj.name
+    // });
 
+    // this.setData({
+    //   songObj,
+    //   songId
+    // })
     this.setData({
-      songObj,
       songId
-    })
+    });
+    this.getMusicDetail();
 
     const urlInfo = await req('/song/url', { id: songId});
     // console.log('urlInfo', urlInfo)
@@ -128,6 +166,8 @@ Page({
     // 绑定背景音频管理器相关的事件监听
     this.backgroundAudioManager = wx.getBackgroundAudioManager();
     this.addEvent();
+
+    // console.log(PubSub)
   },
 
   /**
