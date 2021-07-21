@@ -15,7 +15,7 @@ Page({
     songId:"",
     musicUrl:"",
     isplay:false,
-    durationTime: "59:59",
+    durationTime: 0,
     currentTime: "00:00",
     currentWidth:"80"
   },
@@ -34,7 +34,7 @@ Page({
     const result = await req('/song/detail', { ids: this.data.songId });
     const songObj = result.songs[0];
     // moment(需要格式化的毫秒值).format(需要输出的格式)
-    const durationTime = moment(songObj.dt).format('mm:ss');
+    // const durationTime = moment(songObj.dt).format('mm:ss');
     // console.log(result)
     // 动态设置当前页面的导航栏标题
     wx.setNavigationBarTitle({
@@ -43,7 +43,7 @@ Page({
 
     this.setData({
       songObj,
-      durationTime
+      durationTime: songObj.dt
     })
   },
 

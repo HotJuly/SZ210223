@@ -1,3 +1,4 @@
+<wxs src="./myFilter.wxs" module="myFilter" />
 <view class="songContainer {{isplay?'isplay':''}}">
   <text>{{songObj.ar[0].name}}</text>
   <view class="keng"></view>
@@ -15,7 +16,8 @@
         <view class="point"></view>
       </view>
     </view>
-    <text class="durationTime">{{durationTime}}</text>
+    <!-- <text class="durationTime">{{durationTime}}</text> -->
+    <text class="durationTime">{{myFilter.timeFilter(durationTime)}}</text>
   </view>
 
   <!-- 音乐控制器 -->

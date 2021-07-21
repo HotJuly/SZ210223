@@ -1,0 +1,19 @@
+// 该文件只能写js代码,而且是只支持ES5
+// 暴露语法只能使用commonjs
+
+function timeFilter(time){
+  time = time/1000;
+  var min = Math.floor(time / 60);
+  var sec = Math.floor(time % 60);
+  if(min<10){
+    min = "0"+min;
+  }
+  if (sec < 10) {
+    sec = "0" + sec;
+  }
+  return min+":"+sec
+}
+
+module.exports = {
+  timeFilter: timeFilter
+}
