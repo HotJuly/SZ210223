@@ -38,6 +38,7 @@
   "subpackages": [
     {
       "root":"songs",
+      "name":"haha",
       "pages":[
         "pages/recommendSong/recommendSong",
         "pages/song/song"
@@ -45,6 +46,12 @@
       "independent":true
     }
   ],
+  "preloadRule":{
+    "pages/index/index":{
+      "packages":["haha"],
+      "network":"all"
+    }
+  },
   "requiredBackgroundModes": ["audio"],
   "style": "v2",
   "sitemapLocation": "sitemap.json"
