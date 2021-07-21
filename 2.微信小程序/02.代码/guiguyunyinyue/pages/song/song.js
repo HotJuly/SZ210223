@@ -1,5 +1,6 @@
 // pages/song/song.js
 import PubSub from 'pubsub-js';
+import moment from 'moment';
 import req from '../../utils/req.js';
 
 // 获取到全局唯一的小程序实例
@@ -13,7 +14,18 @@ Page({
     songObj:{},
     songId:"",
     musicUrl:"",
-    isplay:false
+    isplay:false,
+    durationTime: "59:59",
+    currentTime: "00:00",
+    currentWidth:"80"
+  },
+
+  // 用于接收每日推荐页面发送回来的songid,并请求对应数据展示
+  getSongId(msg, songId){
+    this.setData({
+      songId
+    });
+    this.getMusicDetail();
   },
 
   // 用于请求当前songid对应的歌曲详细信息
@@ -21,6 +33,8 @@ Page({
     //发送请求获取歌曲详细信息
     const result = await req('/song/detail', { ids: this.data.songId });
     const songObj = result.songs[0];
+    // moment(需要格式化的毫秒值).format(需要输出的格式)
+    const durationTime = moment(songObj.dt).format('mm:ss');
     // console.log(result)
     // 动态设置当前页面的导航栏标题
     wx.setNavigationBarTitle({
@@ -28,20 +42,22 @@ Page({
     });
 
     this.setData({
-      songObj
+      songObj,
+      durationTime
     })
   },
 
   // 用于监视用户点击上一首/下一首按钮操作,自动切换对应歌曲并播放
   switchSong(event){
-    console.log('switchSong')
-    PubSub.subscribe('sendId',(msg,songId)=>{
-      // console.log('data', data)
-      this.setData({
-        songId
-      });
-      this.getMusicDetail();
-    })
+    // console.log('switchSong')
+    // 此处代码如果重复执行,就会绑定多个订阅,导致请求重复发送
+    // PubSub.subscribe('sendId',(msg,songId)=>{
+    //   // console.log('data', data)
+    //   this.setData({
+    //     songId
+    //   });
+    //   this.getMusicDetail();
+    // })
 
     const {id} = event.currentTarget;
     PubSub.publish('switchType', id);
@@ -54,21 +70,42 @@ Page({
     this.backgroundAudioManager.onPlay(() => {
       // console.log('onPlay')
 
-      // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
-      appInstance.globalData.playState = true;
+      // 判断当前页面跟正在播放的背景音频是否是同一首歌
+      if (appInstance.globalData.audioId === this.data.songId) {
+        // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
+        appInstance.globalData.playState = true;
 
-      this.setData({
-        isplay: true
-      })
+        this.setData({
+          isplay: true
+        })
+      }
     })
 
     // 用于监视背景音频暂停事件
     this.backgroundAudioManager.onPause(() => {
       // console.log('onPause')
-      // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
-      appInstance.globalData.playState = false;
+
+      if (appInstance.globalData.audioId === this.data.songId) {
+        // 使用小程序唯一的实例，记录当前背景音频管理器音乐的播放状态
+        appInstance.globalData.playState = false;
+        this.setData({
+          isplay: false
+        })
+      }
+    })
+
+    // 用于监视背景音频进度更新事件
+    this.backgroundAudioManager.onTimeUpdate(() => {
+      const { currentTime,duration} = this.backgroundAudioManager;
+      // 获取到当前的时间进度并且更新页面
+      const currentTime1 = moment(currentTime*1000).format("mm:ss");
+
+      // 计算进度条的长度:当前时间/总时长
+      const currentWidth = currentTime / duration *100;
+      // console.log('onTimeUpdate',currentTime)
       this.setData({
-        isplay: false
+        currentTime: currentTime1,
+        currentWidth
       })
     })
   },
@@ -168,6 +205,8 @@ Page({
     this.addEvent();
 
     // console.log(PubSub)
+    //由于onLoad只会执行一次,所以,在此处绑定订阅,就不会重复订阅
+    PubSub.subscribe('sendId', this.getSongId);
   },
 
   /**
@@ -188,7 +227,8 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
+    // 解绑已订阅的消息,相当于Vue中解绑全局事件总线
+    PubSub.unsubscribe(this.getSongId)
   },
 
   /**
