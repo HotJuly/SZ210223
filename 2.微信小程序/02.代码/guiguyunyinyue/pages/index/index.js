@@ -10,6 +10,12 @@ Page({
     topList:[]  //用于控制排行榜区域显示
   },
 
+  toRecommendSong(){
+    wx.navigateTo({
+      url:"/songs/pages/recommendSong/recommendSong"
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */

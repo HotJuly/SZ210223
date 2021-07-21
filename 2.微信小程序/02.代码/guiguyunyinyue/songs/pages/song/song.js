@@ -1,7 +1,7 @@
 // pages/song/song.js
 import PubSub from 'pubsub-js';
 import moment from 'moment';
-import req from '../../utils/req.js';
+import req from '../../../utils/req.js';
 
 // 获取到全局唯一的小程序实例
 const appInstance = getApp();
@@ -21,11 +21,22 @@ Page({
   },
 
   // 用于接收每日推荐页面发送回来的songid,并请求对应数据展示
-  getSongId(msg, songId){
+  async getSongId(msg, songId){
     this.setData({
       songId
     });
     this.getMusicDetail();
+    await this.getMusicUrl();
+    this.backgroundAudioManager.src = this.data.musicUrl;
+    this.backgroundAudioManager.title = this.data.songObj.name;
+  },
+
+  // 用于请求当前歌曲的音频链接
+  async getMusicUrl(){
+    const urlInfo = await req('/song/url', { id: this.data.songId });
+    this.setData({
+      musicUrl: urlInfo.data[0].url
+    })
   },
 
   // 用于请求当前songid对应的歌曲详细信息
@@ -108,10 +119,16 @@ Page({
         currentWidth
       })
     })
+
+    // 用于监视背景音频自然播放结束事件
+    this.backgroundAudioManager.onEnded(()=>{
+      // 自动切换下一首歌曲
+      PubSub.publish('switchType', "next");
+    })
   },
   
   //用于监视用户对播放按钮的点击操作,用于控制音乐播放
-  handlePlay(){
+  async handlePlay(){
     // console.log('handlePlay')
 
     // 播放对应的歌曲
@@ -130,11 +147,18 @@ Page({
       // 只有当前页面正处于暂停状态,才能进入此处
       // 进入之后需要播放当前音频
 
+      //如果当前页面已经有音频地址,就不再发送请求
+      if (!this.data.musicUrl) {
+        await this.getMusicUrl();
+      }
 
       //  2.输入src/title,告知即将播放的音频链接,标题
       // 注意:此处官方文档只说需要src,但实际上还需要title,否则无法自动播放
       this.backgroundAudioManager.src = this.data.musicUrl;
       this.backgroundAudioManager.title = this.data.songObj.name;
+
+      // 以下代码用于测试自动切歌功能,用处是将歌曲进度调到指定位置
+      // this.backgroundAudioManager.startTime = 164;
 
       // 使用小程序唯一的实例，记录当前背景音频管理器正在播放的歌曲id
       appInstance.globalData.audioId = this.data.songId;
@@ -177,11 +201,14 @@ Page({
     });
     this.getMusicDetail();
 
-    const urlInfo = await req('/song/url', { id: songId});
-    // console.log('urlInfo', urlInfo)
-    this.setData({
-      musicUrl: urlInfo.data[0].url
-    })
+    // const urlInfo = await req('/song/url', { id: songId});
+    // // console.log('urlInfo', urlInfo)
+    // this.setData({
+    //   musicUrl: urlInfo.data[0].url
+    // })
+
+    //该行代码因为性能优化原因,已经在播放按钮的点击事件内部调用了
+    // this.getMusicUrl();
 
     // 读取数据的方法和普通对象相同
     // 修改数据的方法和普通对象相同
