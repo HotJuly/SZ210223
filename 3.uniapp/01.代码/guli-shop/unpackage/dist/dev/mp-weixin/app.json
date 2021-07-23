@@ -8,5 +8,6 @@
     "navigationBarTitleText": "guli-shop",
     "navigationBarBackgroundColor": "#BB2C08"
   },
-  "usingComponents": {}
+  "usingComponents": {},
+  "sitemapLocation": "sitemap7.json"
 }
