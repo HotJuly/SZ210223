@@ -14,14 +14,26 @@
 		scroll-x="true" 
 		enable-flex="true" 
 		v-if="indexData.kingKongModule">
-			<view class="navItem active">推荐</view>
 			<view 
 			class="navItem" 
-			v-for="item in indexData.kingKongModule.kingKongList" 
+			:class="currentIndex===-1?'active':''"
+			@click="changeCurrentIndex(-1)">推荐</view>
+			<view 
+			class="navItem" 
+			:class="currentIndex===index?'active':''"
+			v-for="(item,index) in indexData.kingKongModule.kingKongList" 
 			:key="item.L1Id"
+			@click="changeCurrentIndex(index)"
 			>{{item.text}}</view>
 		</scroll-view>
+		
+		<view>
+			<Recommend v-if="currentIndex === -1"/>
+			<CategoryList v-else/>
+		</view>
+		
 	</view>
+	
 	
 	
 	<!-- 首先,uniapp支持小程序和h5的标签,但是对小程序的标签支持的比较好-->
@@ -33,16 +45,20 @@
 </template>
 
 <script>
+	import req from '../../utils/req.js';
+	import Recommend from '../../components/Recommend/Recommend.vue';
+	import CategoryList from '../../components/CategoryList/CategoryList.vue';
 	export default {
 		data() {
 			return {
 				title :'Hello',
-				indexData:{}
+				indexData:{},
+				currentIndex:-1
 			}
 		},
 		// uniapp支持小程序的生命周期,也支持Vue的声明周期
 		// 个人建议使用Vue的
-		mounted(){
+		async mounted(){
 			// console.log('mounted')
 			/*
 				1.在哪发
@@ -55,19 +71,28 @@
 				3.往哪发
 					自己创建的服务器和路由接口
 			*/
-		   uni.request({
-			   url:"/api/getIndexData",
-			   success:(res)=>{
-					// console.log('res',res)
-					this.indexData = res.data;
-			   }
-		   })
+		   // uni.request({
+			  //  // url:"/api/getIndexData",
+			  //  url:"http://localhost:3001/getIndexData",
+			  //  success:(res)=>{
+					// // console.log('res',res)
+					// this.indexData = res.data;
+			  //  }
+		   // })
+			const result =await req("/getIndexData");
+			this.indexData = result;
 		},
 		// onLoad() {
 		// 	console.log('onLoad')
 		// },
 		methods :{
-
+			changeCurrentIndex(index){
+				this.currentIndex = index;
+			}
+		},
+		components:{
+			CategoryList,
+			Recommend
 		}
 	}
 </script>

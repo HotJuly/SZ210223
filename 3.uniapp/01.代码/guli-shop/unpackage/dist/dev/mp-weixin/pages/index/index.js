@@ -131,76 +131,101 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var _default =
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 27));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _req = _interopRequireDefault(__webpack_require__(/*! ../../utils/req.js */ 25));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}var Recommend = function Recommend() {return __webpack_require__.e(/*! import() | components/Recommend/Recommend */ "components/Recommend/Recommend").then(__webpack_require__.bind(null, /*! ../../components/Recommend/Recommend.vue */ 30));};var CategoryList = function CategoryList() {return __webpack_require__.e(/*! import() | components/CategoryList/CategoryList */ "components/CategoryList/CategoryList").then(__webpack_require__.bind(null, /*! ../../components/CategoryList/CategoryList.vue */ 35));};var _default =
+
+
 {
   data: function data() {
     return {
       title: 'Hello',
-      indexData: {} };
+      indexData: {},
+      currentIndex: -1 };
 
   },
   // uniapp支持小程序的生命周期,也支持Vue的声明周期
   // 个人建议使用Vue的
-  mounted: function mounted() {var _this = this;
-    // console.log('mounted')
-    /*
-    	1.在哪发
-    		mounted
-    	2.怎么发
-    		使用request方法
-    		此处会发现,uniapp兼容小程序的API
-    		但是推荐使用uni,因为uni是全局对象,uniapp根据当前运行环境,进行多端的适配
-    		例如:uni.request在小程序上就是wx.request,在h5上就是ajax
-    	3.往哪发
-    		自己创建的服务器和路由接口
-    */
-    uni.request({
-      url: "/api/getIndexData",
-      success: function success(res) {
-        // console.log('res',res)
-        _this.indexData = res.data;
-      } });
+  mounted: function () {var _mounted = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {var result;return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
 
-  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                (0, _req.default)("/getIndexData"));case 2:result = _context.sent;
+              this.indexData = result;case 4:case "end":return _context.stop();}}}, _callee, this);}));function mounted() {return _mounted.apply(this, arguments);}return mounted;}(),
+
   // onLoad() {
   // 	console.log('onLoad')
   // },
-  methods: {} };exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+  methods: {
+    changeCurrentIndex: function changeCurrentIndex(index) {
+      this.currentIndex = index;
+    } },
+
+  components: {
+    CategoryList: CategoryList,
+    Recommend: Recommend } };exports.default = _default;
 
 /***/ }),
 /* 21 */
