@@ -131,7 +131,20 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -156,13 +169,38 @@ var _default =
 {
   data: function data() {
     return {
-      title: 'Hello' };
+      title: 'Hello',
+      indexData: {} };
 
   },
-  onLoad: function onLoad() {
+  // uniapp支持小程序的生命周期,也支持Vue的声明周期
+  // 个人建议使用Vue的
+  mounted: function mounted() {var _this = this;
+    // console.log('mounted')
+    /*
+    	1.在哪发
+    		mounted
+    	2.怎么发
+    		使用request方法
+    		此处会发现,uniapp兼容小程序的API
+    		但是推荐使用uni,因为uni是全局对象,uniapp根据当前运行环境,进行多端的适配
+    		例如:uni.request在小程序上就是wx.request,在h5上就是ajax
+    	3.往哪发
+    		自己创建的服务器和路由接口
+    */
+    uni.request({
+      url: "/api/getIndexData",
+      success: function success(res) {
+        // console.log('res',res)
+        _this.indexData = res.data;
+      } });
 
   },
+  // onLoad() {
+  // 	console.log('onLoad')
+  // },
   methods: {} };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 /* 21 */

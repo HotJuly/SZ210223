@@ -27,6 +27,7 @@ const KoaRouter = require('koa-router');
 			koa:
 				ctx		->	request+response(ctx.body=需要返回的数据)
 				next	->	执行下一个路由或者下一个中间件
+			注意:路由的地址,只能写绝对路径
 */
 
 	const router = new KoaRouter();
@@ -36,6 +37,12 @@ const KoaRouter = require('koa-router');
 	router.get('/test',function(ctx,next){
 		console.log('/test success')
 		ctx.body="/test success"
+	})
+	
+	const indexData = require('./datas/index.json');
+	router.get('/getIndexData',function(ctx,next){
+		// console.log('/test success')
+		ctx.body=indexData
 	})
 	
 // 2.将服务器应用实例挂载到某个端口上并监视
