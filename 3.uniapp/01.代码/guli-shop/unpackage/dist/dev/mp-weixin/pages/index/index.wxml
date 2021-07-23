@@ -1,0 +1,1 @@
+<view class="indexContainer"><view class="header"><image class="logo" src="../../static/images/logo.png" mode></image><view class="search"><view class="iconfont icon-sousuo"></view><input class="seachInput" type="text" value="" placeholder-class="placeholder" placeholder="搜索商品"/></view><button class="username">七月</button></view></view>
