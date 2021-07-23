@@ -36,7 +36,7 @@
                   1. 场景举例:在路由参数发生变化,路由路径没发生变化的时候,会监视$route.query的数据
             2. 性能:
                1. computed底层原理也是watch
-               2. 但是computed具有缓存机制,如果computed依赖的数据没有发生变化,那么computed不会重新计算
+               2. computed具有缓存机制,如果computed依赖的数据没有发生变化,那么computed不会重新计算
                3. 总结:computed性能优于watch
    6. dispatch
       1. 用处:专门用于触发action的函数
