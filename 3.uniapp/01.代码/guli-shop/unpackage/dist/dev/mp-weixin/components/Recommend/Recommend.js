@@ -123,7 +123,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 //
 var _default =
 {
-  name: "recommend" };exports.default = _default;
+  name: "Recommend" };exports.default = _default;
 
 /***/ }),
 
