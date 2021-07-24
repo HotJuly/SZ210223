@@ -30,12 +30,13 @@
 		<view class="detailFooter">
 			<image class="service" src="http://yanxuan-static.nosdn.127.net/hxm/yanxuan-wap/p/20161201/style/img/icon-normal/detail-kefu-d10f0489d2.png?imageView&type=webp" mode=""></image>
 			<view class="btn buyNow">立即购买</view>
-			<view class="btn addShopCart">加入购物车</view>
+			<view class="btn addShopCart" @click="addToCart">加入购物车</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import {mapMutations} from 'vuex';
 	import req from '../../utils/req.js';
 	export default {
 		data() {
@@ -50,6 +51,15 @@
 			// console.log('goodId',goodId)
 			const good = await req('/getGoodDetail',{goodId});
 			this.good = good;
+		},
+		methods:{
+			addToCart(){
+				uni.showToast({
+					title:"添加成功"
+				})
+				this.ADDSHOPITEMMUTATION(this.good);
+			},
+			...mapMutations(["ADDSHOPITEMMUTATION"])
 		}
 	}
 </script>

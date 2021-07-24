@@ -19,8 +19,12 @@
 		<!-- 登陆之后的购物车 -->
 		<view v-else>
 		<view class="cartList">
-			<view class="cartItem" v-for="shopItem in cartList" :key="shopItem.id">
-				<text class='iconfont icon-xuanzhong' :class="shopItem.selected?'selected':''"></text>
+			<view class="cartItem" v-for="(shopItem,index) in cartList" :key="shopItem.id">
+				<text 
+				class='iconfont icon-xuanzhong' 
+				:class="shopItem.selected?'selected':''"
+				@click="changeSelect(!shopItem.selected,index)"
+				></text>
 				<view class="shopItem">
 					<image class="shopImg" :src="shopItem.listPicUrl" mode=""></image>
 					<view class="shopInfo">
@@ -30,16 +34,20 @@
 				</view>
 				<!-- 控制数量 -->
 				<view class="countCtrl">
-					<text class="add"> + </text>
+					<text class="add" @click="changeCount(true,index)"> + </text>
 					<text class="count"> {{shopItem.count}} </text>
-					<text class="del"> - </text>
+					<text class="del" @click="changeCount(false,index)"> - </text>
 				</view>
 			</view>
 			
 		</view>
 		<!-- 底部下单 -->
 		<view class="cartFooter">
-			<text class='iconfont icon-xuanzhong selected'></text>
+			<text 
+			class='iconfont icon-xuanzhong' 
+			:class="isSelectedAll?'selected':''"
+			@click="selectAll(!isSelectedAll)"
+			></text>
 			<text class="allSelected">已选 3</text>
 			<view class="right">
 				<text class="totalPrice">合计: ￥1000</text>
@@ -51,7 +59,7 @@
 </template>
 
 <script>
-	import {mapState} from 'vuex';
+	import {mapState,mapMutations,mapGetters} from 'vuex';
 	export default {
 		data() {
 			return {
@@ -70,7 +78,22 @@
 		computed:{
 			...mapState({
 				cartList:state=>state.cart.cartList
-			})
+			}),
+			...mapGetters(["isSelectedAll"])
+		},
+		methods:{
+			changeCount(flag,index){
+				// console.log(flag,index)
+				this.CHANGECOUNTMUTATION({flag,index})
+			},
+			changeSelect(selected,index){
+				// console.log(selected)
+				this.CHANGESELECTEDMUTATION({selected,index})
+			},
+			selectAll(selected){
+				this.SELECTALLMUTATION(selected)
+			},
+			...mapMutations(["CHANGECOUNTMUTATION",'CHANGESELECTEDMUTATION','SELECTALLMUTATION'])
 		}
 	}
 </script>

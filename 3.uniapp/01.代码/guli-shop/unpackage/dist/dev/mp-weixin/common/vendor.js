@@ -10430,7 +10430,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 var state = {
   cartList: [{
     "selected": true,
@@ -10589,14 +10589,74 @@ var state = {
 
 
 
-var mutations = {};
+var mutations = {
+  ADDSHOPITEMMUTATION: function ADDSHOPITEMMUTATION(state, good) {
+    /*
+                                                                  	如果当前商品在购物车中不存在,需要将商品添加到购物车中
+                                                                  	如果当前商品在购物车中已经存在,只需要将该商品的数量+1即可
+                                                                  */
+    // console.log('ADDSHOPITEMMUTATION')
+    var cartList = state.cartList;
+    var shopItem = cartList.find(function (shopItem) {
+      return shopItem.id === good.id;
+    });
+
+    if (shopItem) {
+      // console.log("+1",shopItem)
+      shopItem.count += 1;
+    } else {
+      // good.count = 1;
+      _vue.default.set(good, "count", 1);
+      // console.log("=1",good)
+      cartList.push(good);
+    }
+  },
+  CHANGECOUNTMUTATION: function CHANGECOUNTMUTATION(state, _ref) {var index = _ref.index,flag = _ref.flag;
+    // console.log(index,flag)
+    /*
+    	如果商品数量大于1,那么本次操作就减少一个
+    	如果商品数量等于1,那么本此操作就将该商品删除
+    */
+    if (flag) {
+      state.cartList[index].count += 1;
+    } else {
+      if (state.cartList[index].count > 1) {
+        state.cartList[index].count -= 1;
+      } else {
+        state.cartList.splice(index, 1);
+      }
+    }
+  },
+  CHANGESELECTEDMUTATION: function CHANGESELECTEDMUTATION(state, _ref2) {var selected = _ref2.selected,index = _ref2.index;
+    state.cartList[index].selected = selected;
+  },
+  SELECTALLMUTATION: function SELECTALLMUTATION(state, selected) {
+    state.cartList.forEach(function (shopItem) {
+      shopItem.selected = selected;
+    });
+  } };
 
 
 var actions = {};
 
 
-var getters = {};var _default =
-
+var getters = {
+  isSelectedAll: function isSelectedAll(state) {
+    /*
+                                                	1.返回值布尔值
+                                                	2.如果购物车列表中,所有商品都是选中状态,那么返回true
+                                                	3.如果购物车中,有至少一个商品是未选中状态,那么返回false
+                                                	4.如果购物车中没有商品,返回false
+                                                */
+    // state.cartList.some((shopItem)=>{
+    //  return !shopItem.selected
+    // })
+    if (!state.cartList.length) return false;
+    var result = state.cartList.every(function (shopItem) {
+      return shopItem.selected;
+    });
+    return result;
+  } };var _default =
 
 
 {

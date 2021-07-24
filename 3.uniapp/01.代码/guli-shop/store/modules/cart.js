@@ -1,4 +1,4 @@
-
+import Vue from 'vue';
 const state = {
 	cartList:[{
 		"selected":true,
@@ -158,13 +158,73 @@ const state = {
 };
 
 const mutations = {
+	ADDSHOPITEMMUTATION(state,good){
+		/*
+			如果当前商品在购物车中不存在,需要将商品添加到购物车中
+			如果当前商品在购物车中已经存在,只需要将该商品的数量+1即可
+		*/
+		// console.log('ADDSHOPITEMMUTATION')
+		const cartList= state.cartList;
+		const shopItem = cartList.find((shopItem)=>{
+			return shopItem.id === good.id
+		})
+		
+		if(shopItem){
+			// console.log("+1",shopItem)
+			shopItem.count+=1;
+		}else{
+			// good.count = 1;
+			Vue.set(good,"count",1);
+			// console.log("=1",good)
+			cartList.push(good);
+		}
+	},
+	CHANGECOUNTMUTATION(state,{index,flag}){
+		// console.log(index,flag)
+		/*
+			如果商品数量大于1,那么本次操作就减少一个
+			如果商品数量等于1,那么本此操作就将该商品删除
+		*/
+	   if(flag){
+		state.cartList[index].count+=1;
+	   }else{
+		   if(state.cartList[index].count>1){
+				state.cartList[index].count-=1;
+		   }else{
+				state.cartList.splice(index,1);
+		   }
+	   }
+	},
+	CHANGESELECTEDMUTATION(state,{selected,index}){
+		state.cartList[index].selected = selected;
+	},
+	SELECTALLMUTATION(state,selected){
+		state.cartList.forEach((shopItem)=>{
+			shopItem.selected = selected
+		})
+	}
 }
 
 const actions = {
 }
 
 const getters = {
-	
+	isSelectedAll(state){
+		/*
+			1.返回值布尔值
+			2.如果购物车列表中,所有商品都是选中状态,那么返回true
+			3.如果购物车中,有至少一个商品是未选中状态,那么返回false
+			4.如果购物车中没有商品,返回false
+		*/
+	   // state.cartList.some((shopItem)=>{
+		  //  return !shopItem.selected
+	   // })
+	   if(!state.cartList.length)return false;
+	   const result = state.cartList.every((shopItem)=>{
+		   return shopItem.selected
+	   })
+	   return result;
+	}
 }
 
 export default{
