@@ -1,5 +1,7 @@
 const Koa = require('koa');
 const KoaRouter = require('koa-router');
+var Fly=require("flyio/src/node")
+var fly=new Fly;
 
 /*
 	koa服务器搭建流程:
@@ -77,6 +79,21 @@ const KoaRouter = require('koa-router');
 		})
 		
 		ctx.body=good
+	})	
+	
+
+	router.get('/getOpenId',async function(ctx,next){
+		// console.log('/getOpenId success',ctx.query.code)
+		const {code} = ctx.query;
+		const appid = "wxe5931a68ea66cece";
+		const appSecret = "8d996a93ae41ea46e5799808e5eb8244";
+		const url =`https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`;
+		// ctx.body=indexData
+		// fetch	->前端用于发送HTTP请求的技术,和ajax不同
+		const result = await fly.get(url);
+		const {openid} = JSON.parse(result.data);
+		// console.log(openid)
+		ctx.body=openid;
 	})	
 	
 // 2.将服务器应用实例挂载到某个端口上并监视

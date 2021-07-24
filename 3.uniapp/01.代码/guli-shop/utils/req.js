@@ -38,6 +38,9 @@ export default function(url,data={},method="GET"){
 		   url:baseUrl+url,
 		   data,
 		   method,
+		   header:{
+			   token:uni.getStorageSync('token')
+		   },
 		   success:(res)=>{
 				// console.log('res',res)
 				resolve(res.data)
