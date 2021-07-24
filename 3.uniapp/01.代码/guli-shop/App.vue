@@ -14,5 +14,7 @@
 
 <style lang="stylus">
 	@import url('/static/iconfont/iconfont.styl')
+	page
+		height 100%
 	/*每个页面公共css */
 </style>

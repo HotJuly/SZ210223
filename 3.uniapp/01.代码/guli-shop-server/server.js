@@ -51,6 +51,34 @@ const KoaRouter = require('koa-router');
 		ctx.body=categoryDatas
 	})
 	
+	const indexCateList = require('./datas/indexCateList.json');
+	router.get('/getindexCateList',async function(ctx,next){
+		// console.log('/test success')
+		// koa服务器中,要求如果是异步返回数据,函数必须返回的是promise对象
+		await new Promise((resolve)=>{
+			setTimeout(()=>{
+				resolve();
+			},2000)
+		})
+		ctx.body=indexCateList;
+	})
+	
+	
+	const goods = require('./datas/goods.json');
+	router.get('/getGoodDetail',function(ctx,next){
+		// koa框架获取参数
+		console.log('/getGoodDetail success',ctx.query)
+		// 注意:通过url传递的数据,一定会被变成字符串
+		const {goodId} =ctx.query;
+		
+		const good = goods.find((good)=>{
+			// 位运算符,是将数据先转为二进制,在进行位置的平移
+			return good.id === goodId>>>0
+		})
+		
+		ctx.body=good
+	})	
+	
 // 2.将服务器应用实例挂载到某个端口上并监视
 	app.listen(3001,(error)=>{
 		if(error){
