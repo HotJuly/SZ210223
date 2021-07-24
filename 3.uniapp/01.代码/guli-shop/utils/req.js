@@ -11,14 +11,23 @@
 import config from './config.js';
 
 let baseUrl = "";
-const {platform} = uni.getSystemInfoSync();
-if(platform==="devtools"){
-	// 能进入此处就说明当前运行环境是小程序
+// const {platform} = uni.getSystemInfoSync();
+// if(platform==="devtools"){
+// 	// 能进入此处就说明当前运行环境是小程序
+// 	baseUrl = config.mpHost;
+// }else if(platform==="ios"){
+// 	// 能进入此处就说明当前运行环境是ios系统的浏览器
+// 	baseUrl = config.h5Host;
+// }
+
+// #ifdef MP-WEIXIN
 	baseUrl = config.mpHost;
-}else if(platform==="ios"){
-	// 能进入此处就说明当前运行环境是ios系统的浏览器
+// #endif
+
+// #ifdef H5
 	baseUrl = config.h5Host;
-}
+// #endif
+
 
 // console.log(uni.getSystemInfoSync());
 

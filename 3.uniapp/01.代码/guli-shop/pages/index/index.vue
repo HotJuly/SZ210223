@@ -29,7 +29,7 @@
 		
 		<view>
 			<Recommend v-if="currentIndex === -1"/>
-			<CategoryList v-else/>
+			<CateList v-else/>
 		</view>
 		
 	</view>
@@ -45,14 +45,15 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex';
 	import req from '../../utils/req.js';
 	import Recommend from '../../components/Recommend/Recommend.vue';
-	import CategoryList from '../../components/CategoryList/CategoryList.vue';
+	import CateList from '../../components/CateList/CateList.vue';
 	export default {
 		data() {
 			return {
 				title :'Hello',
-				indexData:{},
+				// indexData:{},
 				currentIndex:-1
 			}
 		},
@@ -79,8 +80,10 @@
 					// this.indexData = res.data;
 			  //  }
 		   // })
-			const result =await req("/getIndexData");
-			this.indexData = result;
+			// console.log('$store',this.$store.state.home.initData)
+			// const result =await req("/getIndexData");
+			// this.indexData = result;
+			this.$store.dispatch('getIndexData');
 		},
 		// onLoad() {
 		// 	console.log('onLoad')
@@ -90,8 +93,17 @@
 				this.currentIndex = index;
 			}
 		},
+		computed:{
+			// indexData(){
+			// 	return this.$store.state.home.indexData
+			// }
+			...mapState({
+				indexData:state=>state.home.indexData
+			})
+			// mapState(["indexData"])
+		},
 		components:{
-			CategoryList,
+			CateList,
 			Recommend
 		}
 	}
