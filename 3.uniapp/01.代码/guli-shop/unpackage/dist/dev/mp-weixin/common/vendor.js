@@ -8400,7 +8400,7 @@ module.exports = {"_from":"@dcloudio/uni-stat@next","_id":"@dcloudio/uni-stat@2.
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "首页" } }, "globalStyle": { "navigationBarTextStyle": "white", "navigationBarTitleText": "guli-shop", "navigationBarBackgroundColor": "#BB2C08" } };exports.default = _default;
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "首页", "usingComponents": { "cate-list": "/components/CateList/CateList", "recommend": "/components/Recommend/Recommend" } }, "pages/category/category": { "usingComponents": {} }, "pages/personal/personal": { "usingComponents": {} }, "pages/cart/cart": { "usingComponents": {} } }, "globalStyle": { "navigationBarTextStyle": "white", "navigationBarTitleText": "guli-shop", "navigationBarBackgroundColor": "#BB2C08" } };exports.default = _default;
 
 /***/ }),
 /* 8 */

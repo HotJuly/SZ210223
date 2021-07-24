@@ -43,6 +43,12 @@ const KoaRouter = require('koa-router');
 	router.get('/getIndexData',function(ctx,next){
 		// console.log('/test success')
 		ctx.body=indexData
+	})	
+	
+	const categoryDatas = require('./datas/categoryDatas.json');
+	router.get('/getcategoryDatas',function(ctx,next){
+		// console.log('/test success')
+		ctx.body=categoryDatas
 	})
 	
 // 2.将服务器应用实例挂载到某个端口上并监视

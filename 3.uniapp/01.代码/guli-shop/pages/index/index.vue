@@ -27,10 +27,10 @@
 			>{{item.text}}</view>
 		</scroll-view>
 		
-		<view>
+		<scroll-view class="contentScroll" scroll-y="true">
 			<Recommend v-if="currentIndex === -1"/>
 			<CateList v-else/>
-		</view>
+		</scroll-view>
 		
 	</view>
 	
@@ -167,4 +167,14 @@
 				line-height 80upx
 				&.active
 					border-bottom 3upx solid red
+		.contentScroll
+			// 小程序height计算:height = 屏幕百分百高度 - header高度 - nav高度
+			// h5项目height计算:height = 屏幕百分百高度 - header高度 - nav高度 - 导航栏高度 - tabBar高度
+			// height calc(100vh - 80upx - 83upx - var(--window-top) - var(--window-bottom))
+			/* #ifdef H5 */
+			height calc(100vh - 80upx - 83upx - 88upx - 100upx)
+			/* #endif */
+			/* #ifdef MP-WEIXIN */
+			height calc(100vh - 80upx - 83upx)
+			/* #endif */
 </style>
