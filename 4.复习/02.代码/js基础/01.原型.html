@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        /*
+        - 每个函数都有一个显式原型: `prototype`
+        - 每个实例都有一个隐式原型: `__proto__`
+        - 实例的`__proto__`与对应构造函数的`prototype`都指向原型对象
+        - 原型对象上有一个`constructor`属性指向对应的构造函数
+        */
+        /*
+            如何区分构造函数和普通函数
+                通过函数声明是无法分辨构造函数和普通函数的
+                通过是否是构造调用new,来区分一个函数是不是构造函数
+        */
+       /*
+            无论是函数名还是变量名,统称为标识
+       */
+        /*
+            构造函数具有显示原型属性和对应的原型对象
+            那么,普通函数也有显示原型属性和对应的原型对象
+        */
+       /*
+        new关键字所做的事情总结:
+            1.将实参的值传入到形参中
+            2.声明了this,var this = new Object();
+            3.将构造函数的原型对象的地址值(当前new的一瞬间的原型对象),传给了实例对象的隐式原型属性
+                    this.__proto__ = person.prototype
+            4.会默认返回当前的实例对象this
+                如果返回值不是对象数据类型,会自动返回this
+                如果返回值是对象数据类型,会返回该对象,不会返回this
+       */
+        function person(name){
+            this.name=name;
+            // console.log(this)
+            // return {
+            //     a:123
+            // };
+        }
+
+        // var p1 = person();
+        var p1 = new person("xiaoming");
+        console.log(p1)
+    </script>
+</body>
+</html>

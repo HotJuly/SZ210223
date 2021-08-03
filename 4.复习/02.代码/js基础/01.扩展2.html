@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        /*
+            原型对象
+            属性和方法的区别:方法是特殊的属性,特殊在属性值是个函数
+            如果当前实例对象使用一个属性或者方法
+                查找规则(顺着隐式原型向上找):
+                    p1.c => 
+                        p1.__proto__.c ===  person.prototype.c
+                修改规则(不会顺着隐式原型向上找):
+                    p1.c = 8 ;
+                    如果p1没有这个属性,他只会给p1,新增该属性,不会找到person.prototype.c
+            
+            注意:
+                1.面试题中到底有没有改变显示原型属性的指向
+                2.创建时间,确定到底是先修改了显示原型属性的指向还是先创建的实例对象
+        */
+        function person(name){
+            this.name=name;
+        }
+
+        // var person = new Function();
+        // var obj = {}
+        // var arr = [];
+
+
+        person.prototype.c = 1;
+        // person.prototype = {
+        //     c:1
+        // }
+
+        var p1 = new person("xiaoming");
+        // p1.c = 8;
+        p1.c +=1;
+        // p1.c = p1.c + 1;
+        // p1.c = (p1.c + 1);   =>  p1.c = (p1.__proto__.c + 1) 
+        // =>p1.c = person.prototype.c + 1  =>  p1.c = 1 + 1
+        console.log(p1,p1.c,person.prototype.c)
+
+        // console.log(p2,p1.d)
+    </script>
+</body>
+</html>

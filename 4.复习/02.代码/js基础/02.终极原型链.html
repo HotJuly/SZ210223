@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        /*
+            理解:A是不是B创建出来
+            A instanceof B原理
+                实际上就是递归查找B的原型对象到底有没有出现在A的原型链上
+            A.__proto__ === B.prototype
+            A.__proto__.__proto__  === B.prototype
+
+            问题:什么是伪数组
+                1.以下标存储数据
+                2.必须具有length属性
+                3.不能使用数组的方法
+        */
+       /*
+            1.万物皆对象(除了基本数据类型)
+            2.所有的对象都是Object的实例对象(间接或者直接)
+            3.所有的函数都是Function的实例对象(包括他自己???)
+            4.函数是特殊的对象(举例:Foo.prototype),函数在js中是一等公民
+
+            注意:
+                1.到底是函数创建了对象,还是对象创建了函数?
+                    其实js中使用c语言写的三个东西:
+                        1.Object
+                        2.Function
+                        3.Function.prototype
+                2.在js终极原型链中,一共有四条链是作者自己加上去的
+                    1)Function的隐式原型属性和Function的显示原型属性指向同一个原型对象
+                        由于Function自己本身就是一个函数,所以他也要能使用所有函数共享的方法(而方法都在Function的原型对象上)
+                    2)Object的隐式原型属性和Function的显示原型属性指向同一个原型对象
+                        同1)
+                    3)Function的原型对象的隐式原型属性和Object的显示原型属性指向相同
+                        因为在JS设计的时候,Function就是一个特殊的对象,那么说明Object的原型对象要出现在Function的原型链上
+                    4)Object的原型对象的隐式原型属性是null
+                        因为所有的对象都是Object的实例对象,会导致Object的原型对象的隐式原型指向自己,会产生死循环
+       */   
+        // var Foo = new Function();
+        function Foo () {}
+        const f1 = new Foo()
+        const f2 = new Foo()
+
+        const o1 = new Object()
+        const o2 = {}
+
+        // Foo instanceof Object     true
+        // Foo instanceof Function    true
+        // Object instanceof Object  true
+        // Function instanceof Function true
+        // Function instanceof Object  true
+
+        // Object instanceof Foo    false
+        // f1 instanceof Function   false
+        // f1 instanceof Object     true
+    </script>
+</body>
+</html>
