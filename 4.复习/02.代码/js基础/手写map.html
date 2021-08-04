@@ -42,18 +42,18 @@
        var obj = {name:"xiaoming",age:"18"};
 
     //Object.keys+forEach版本
-    //    Object.prototype.myMap = function(fn){
-    //     //this->obj对象
-    //     var keys = Object.keys(this);
-    //     var that = this;
-    //     var newObj = {};
-    //     keys.forEach(function(key,index){
-    //         // console.log(that[key])
-    //         newObj[key] = fn(that[key],key);
-    //     })
-    //     return newObj;
-    //     // console.log(keys)
-    //    }
+       Object.prototype.myMap = function(fn){
+        //this->obj对象
+        var keys = Object.keys(this);
+        var that = this;
+        var newObj = {};
+        keys.forEach(function(key,index){
+            // console.log(that[key])
+            newObj[key] = fn(that[key],key);
+        })
+        return newObj;
+        // console.log(keys)
+       }
 
     //for...in + hasOwnProperty版本
     //    Object.prototype.myMap = function(fn){
