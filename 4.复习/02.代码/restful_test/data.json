@@ -1,0 +1,19 @@
+{
+  "user": [
+    {
+      "id": 1,
+      "username": "xiaoming",
+      "age": 18
+    },
+    {
+      "id": 2,
+      "username": "xiaohong",
+      "age": 29
+    },
+    {
+      "id": 3,
+      "username": "xiaowang",
+      "age": 38
+    }
+  ]
+}
