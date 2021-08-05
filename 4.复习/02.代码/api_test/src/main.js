@@ -30,7 +30,31 @@ Vue.config.productionTip = false
 //   console.log('errorHandler',err, vm, info)
 // }
 
+// 需求:所有组件mounted的时候,打印自身配置对象中的name属性
+// Vue.mixin({
+//   mounted(){
+//     console.log(this.$options.name)
+//   }
+// })
+
+
+// Vue1中,App组件的挂载实际上是向页面上的div#app元素内部插入元素
+// Vue2中,App组件的挂载实际上是将页面上的div#app元素替换掉
+// 渲染内容优先级:render属性>template属性>html内容
 new Vue({
+  name:"root",
   render: h => h(App),
+  // template:"<h1>大佐牛逼`!</h1>",
 }).$mount('#app')
-new Vue()
+// new Vue()
+
+// var res = Vue.compile('<h1>{{msg}},大佐牛逼~!</h1>')
+// console.log(res)
+
+// new Vue({
+//   data: {
+//     msg: 'hello'
+//   },
+//   el:"#app",
+//   render: res.render,
+// })
