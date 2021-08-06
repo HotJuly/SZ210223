@@ -10,10 +10,9 @@
   --></head>
   <body>
     <div id="app">
-      <p>{{person.name}}</p>
-      <p v-html="msg"></p>
       <p>{{msg}}</p>
-      <button v-on:click="handleClick">按钮</button>
+      <p>{{person.name}}</p>
+      <button id="btn">修改name</button>
     </div>
     <script src="./js/observer.js"></script>
     <script src="./js/watcher.js"></script>
@@ -38,23 +37,23 @@
               更新数据
               dep方法通知所有watcher来更新用户界面        
       */
-      new MVVM({
-        // el: "#app",
-        el: document.getElementById("app"),
+      var vm = new MVVM({
+        el: "#app",
+        // el: document.getElementById("app"),
         data: {
           msg: "hello mvvm",
-          person: {
-            name: "jack",
-          },
-        },
-        methods: {
-          handleClick() {
-            // 当用户更新数据 --> 触发数据代理set --> 触发数据劫持的set
-            this.msg += "~~~~";
-          },
-        },
+          person:{
+            name:"xiaoming"
+          }
+        }
       });
 
+      // vm.person.name=123;
+
+      btn.onclick=function(){
+        vm.person.name=123;
+        // vm._data.person.name=123;
+      }
 
     </script>
   </body>

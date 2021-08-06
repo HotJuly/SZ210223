@@ -1,6 +1,11 @@
 function Watcher(vm, expOrFn, cb) {
+  // Vue1中,更新的最小单位是节点
+  // Vue2中,更新的最小单位是组件
+    // new Watcher(vm, "msg", function (value, oldValue) {
+    //   textUpdater && textUpdater(text节点, value, oldValue);
+    // });
+    // 此处this是watcher实例
   // 更新用户界面的函数
-  //this->watcher实例对象
   this.cb = cb;
   this.vm = vm;
   this.expOrFn = expOrFn;
@@ -11,15 +16,11 @@ function Watcher(vm, expOrFn, cb) {
     this.getter = expOrFn;
   } else {
     this.getter = this.parseGetter(expOrFn.trim());
-    // this.getter = function getter(obj) {
-      // obj->vm this->vm
+    // this.getter=function getter(obj) {
     //   for (var i = 0, len = exps.length; i < len; i++) {
     //     if (!obj) return;
     //     // 读取属性 --> 触发数据代理的get --> 触发数据劫持的get
-    //     // obj = vm["msg"];->vm.msg->触发数据代理->return vm._data.msg
-    //     // vm._data.msg->触发数据劫持
     //     obj = obj[exps[i]];
-    //     obj = vm["msg"];
     //   }
     //   return obj;
     // };
@@ -37,10 +38,12 @@ Watcher.prototype = {
   },
   run: function () {
     // 得到当前表达式的值，存在this.value(代表上一次的值)
-    // 建立dep和watcher之间的关系（如果已经建立了，就不会了）
-    var value = this.get();//var value = "hello world"
+    // 重新建立dep和watcher之间的关系（如果已经建立了，就不会了）
+
+    // 用来获取到当前响应式属性的最新值(person.name)
+    var value = this.get();
     // 上一次表达式的值
-    var oldVal = this.value;//this.value="hello MVVM"
+    var oldVal = this.value;
     if (value !== oldVal) {
       // 更新值
       this.value = value;
@@ -64,46 +67,54 @@ Watcher.prototype = {
     // 触发了addDep(), 在整个forEach过程，当前wacher都会加入到每个父级过程属性的dep
     // 例如：当前watcher的是'child.child.name', 那么child, child.child, child.child.name这三个属性的dep都会加入当前watcher
 
+
+    
+    // watcher.addDep(dep)
     // 判断watcher中有没有保存过dep，没有保存才执行
     if (!this.depIds.hasOwnProperty(dep.id)) {
       // 在dep中保存watcher
       // 有什么用？将来数据发生变化，能通过dep找到所有watcher从而更新
       dep.addSub(this);
+      // dep.addSub(watcher);
       // 在watcher中保存dep
       // 有什么用？ 防止dep重复保存watcher
-      //{ 1:dep}
+      // watcher收集到与他相关的dep了
+      // 解释:该插值语法或者指令用到了哪几个响应式属性
       this.depIds[dep.id] = dep;
     }
   },
   get: function () {
     // 将Dep.target赋值为当前watcher
+    // 此处this是watcher实例
     Dep.target = this;
-    // Dep.target = watcher;
     var value = this.getter.call(this.vm, this.vm);
     Dep.target = null;
     return value;
   },
 
   parseGetter: function (exp) {
-    // [^\w.$]->[^a-zA-Z0-9_.$]->匹配特殊字符+ - *
-    // "msg"
+    // exp=>"msg"
+    // \w等于A-Za-z0-9._$,此处正则是用来匹配特殊字符+name*/><
     if (/[^\w.$]/.test(exp)) return;
     // exp person.name
     // exps ['person', 'name']
-    //exp msg->["msg"]
     var exps = exp.split(".");
 
     // 就是this.getter
     // 类似于 this._getVMVal() 得到表达式的值
     return function getter(obj) {
-      // obj->vm this->vm
+      // this是vm,obj也是vm
       for (var i = 0, len = exps.length; i < len; i++) {
         if (!obj) return;
         // 读取属性 --> 触发数据代理的get --> 触发数据劫持的get
-        // obj = vm["msg"];->vm.msg->触发数据代理->return vm._data.msg
-        // vm._data.msg->触发数据劫持
         obj = obj[exps[i]];
       }
+      // for (var i = 0, len = 2; i < len; i++) {
+      //   if (!obj) return;
+      //   // 读取属性 --> 触发数据代理的get(读取vm._data.person) --> 触发数据劫持的get
+      //   obj = obj[exps[i]];
+      // obj = vm['person'];
+      // }
       return obj;
     };
   },
