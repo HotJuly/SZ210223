@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btn">修改</button>
+    <script>
+        // btn.onclick=function(){
+        //     window.location.hash="/about"
+        // }
+        // window.addEventListener('hashchange',function(event){
+        //     console.log('hashchange',event)
+        //     // 通过window.location.hash可以获得当前最新hash地址
+        // })
+
+        
+        btn.onclick=function(){
+            window.history.pushState({},"","/about")
+        }
+        window.addEventListener('popstate',function(event){
+            console.log('popstate',event)
+            // 通过window.location.pathname可以获得当前最新history地址
+        })
+    </script>
+</body>
+</html>

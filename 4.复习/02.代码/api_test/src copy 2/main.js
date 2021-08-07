@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-import router from './router'
-
 Vue.config.productionTip = false
 
 // 可以开启或者关闭调试工具
@@ -45,7 +43,6 @@ Vue.config.productionTip = false
 // 渲染内容优先级:render属性>template属性>html内容
 new Vue({
   name:"root",
-  router,
   render: h => h(App),
   // template:"<h1>大佐牛逼`!</h1>",
 }).$mount('#app')
