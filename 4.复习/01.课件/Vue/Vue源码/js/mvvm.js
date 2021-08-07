@@ -17,6 +17,9 @@ function MVVM(options) {
   */
   // 给实例对象vm添加$options，值是配置对象
   this.$options = options || {};
+
+  // 此处执行beforeCreate
+  
   // 给实例对象vm添加_data（原数据），值就是配置对象中data数据
   // 定义变量data，值就是配置对象中data数据
   var data = this._data = this.$options.data;
@@ -30,7 +33,6 @@ function MVVM(options) {
   
   // 缓存this，为了后面函数可以使用
   var me = this;
-
 
   // 重点一:数据代理
   // 效果:将data中的所有属性名,都映射到this身上
@@ -71,6 +73,8 @@ function MVVM(options) {
   // 数据劫持的次数,是根据data对象内部的属性名多少决定的
   observe(data, this);
   // observe(data, vm);
+
+  // 此处执行created
 
 
 

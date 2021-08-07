@@ -11,11 +11,15 @@ function Compile(el, vm) {
   if (this.$el) {
     // 1. 将元素节点转换成文档碎片节点
     this.$fragment = this.node2Fragment(this.$el);
+    // 此处执行beforeMount
+
     // this.$fragment = this.node2Fragment(app元素);
     // 2. 解析模板（解析插值语法和指令语法）
     this.init();
     // 3. 将模板解析后的文档碎片节点添加到el容器中生效
     this.$el.appendChild(this.$fragment);
+
+    // 此处执行mounted
   }
 }
 

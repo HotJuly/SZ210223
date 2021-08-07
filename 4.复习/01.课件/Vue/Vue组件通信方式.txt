@@ -61,3 +61,6 @@
 	默认插槽	
 	具名插槽
 	作用域插槽
+7.Vuex
+
+8.Vue.prototype+Vue.observable(相当于简化版Vuex)

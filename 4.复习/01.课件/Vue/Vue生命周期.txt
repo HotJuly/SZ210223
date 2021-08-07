@@ -1,0 +1,50 @@
+Vue一共具有多少个生命周期?
+一共是11个,常用的是8个
+
+初始化阶段
+beforeCreate
+	beforeCreate之前是在初始化生命周期或者自定义事件
+created
+	发送请求
+		发送请求时机更早,回来的也相对更快
+	简单的逻辑交互
+	注意:不要在此处做复杂耗时的一些操作,否则由于js引擎解析特点,会导致页面的解析和渲染都被延迟
+
+	beforeCreate之后,created之前是在注入数据代理和注入数据劫持
+beforeMount
+	created之后,beforeMount之前是准备挂载该组件,并且将template字符串转换成render函数(或者直接使用html中的代码作为模版)
+mounted
+	发送请求
+		页面首屏展示更快,先展示初始页面,在发送请求
+	操作真实DOM
+		1.创建Swiper实例,实现轮播图
+		2.创建页面滚动效果
+	绑定事件总线,绑定自定义事件
+
+	beforeMount之后,mounted之前是通过render函数生成虚拟DOM,并通过虚拟DOM生成真实DOM,
+	最终将生成的真实DOM替换掉页面上的el元素
+
+更新阶段
+beforeUpdate
+updated
+	二次操作真实DOM
+		由于data状态发生变化,可能会去刷新轮播图等操作
+
+卸载阶段
+beforeDestroy
+	解绑事件监听
+		通过Vue绑定的事件不需要你操心
+		没有经过Vue语法,自己通过原生DOM事件绑定的事件回调函数(onclick,addEventListener)
+	解绑事件总线的订阅
+		虽然当前组件即将卸载,组件实例会被销毁,但是Vue原型上的$bus也是一个Vue实例,他不会销毁,
+		所以在他身上的自定义事件不会消失,从而导致回调函数不会垃圾回收机制销毁
+destroyed
+
+keep-alive专属
+activated(激活)
+deactivated(失活)
+
+捕获后代组件错误的生命周期
+errorCaptured
+	注意:该生命周期无法捕获自身出现的错误
+Vue.config.errorHandler的捕获范围是整个项目,范围比较当前生命周期更大
