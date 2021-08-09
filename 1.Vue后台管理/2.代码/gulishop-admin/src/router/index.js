@@ -30,6 +30,10 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+
+//开发中,路由分为三种:常量路由,异步路由,任意路由
+// 常量路由:就是没登录帐号之前就一定有的路由
+// 异步路由:根据登录的账号权限,动态添加的路由
 export const constantRoutes = [
   {
     path: '/login',
@@ -53,16 +57,19 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
-  },
+  }
+]
 
+export const asyncRoutes = [
   {
     path: '/product',
     component: Layout,
+    name:"Product",
     redirect: 'trademark/list',
     children: [
       {
         path: 'trademark/list',
-        name: 'TradeMark',
+        name: 'Trademark',
         component: () => import('@/views/product/trademark/list'),
         meta: { title: '品牌管理'}
       },
@@ -74,20 +81,21 @@ export const constantRoutes = [
       },
       {
         path: 'spu/list',
-        name: 'SPU',
+        name: 'Spu',
         component: () => import('@/views/product/spu/list'),
         meta: { title: 'SPU管理'}
       },
       {
         path: 'sku/list',
-        name: 'SKU',
+        name: 'Sku',
         component: () => import('@/views/product/sku/list'),
         meta: { title: 'SKU管理'}
       }
     ],
     meta: { title: '商品管理', icon: 'el-icon-s-shop' }
-  },
+  }]
 
+export const anyRoutes = [
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

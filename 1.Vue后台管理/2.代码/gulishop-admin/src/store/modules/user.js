@@ -1,12 +1,21 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
+import { resetRouter , constantRoutes , asyncRoutes , anyRoutes } from '@/router'
+import router from '@/router'
+import filterAsyncRoutes from '@/utils/filterAsyncRoutes';
+import mapButtons from '@/utils/mapButtons';
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+
+    // 权限管理相关
+    roles:[],
+    routeNames:[],
+    routes:[],
+    buttons:{}
   }
 }
 
@@ -24,6 +33,17 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_PERMISSION:(state,info)=>{
+    state.roles = info.roles;
+    state.routeNames = info.routes;
+    const selectAsyncRoutes = filterAsyncRoutes(asyncRoutes,info.routes);
+    // 此时routes中存储了当前账号所有的路由对象信息,目的是为了方便左侧菜单的展示
+    state.routes = constantRoutes.concat(selectAsyncRoutes,anyRoutes);
+    // console.log(filterAsyncRoutes(asyncRoutes,info.routes));
+    // 动态注入异步路由
+    router.addRoutes([...selectAsyncRoutes,...anyRoutes]);
+    state.buttons = mapButtons(info.buttons);
   }
 }
 
@@ -75,6 +95,7 @@ const actions = {
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_PERMISSION',data)
         resolve(data)
       }).catch(error => {
         reject(error)

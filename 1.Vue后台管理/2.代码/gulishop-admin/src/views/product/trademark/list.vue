@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-button style="margin-top: 20px" type="primary" icon="el-icon-plus" @click="showDialog"
+      v-has-permission="`Trademark.add`"
       >添加</el-button
     >
     <!-- 
@@ -35,10 +36,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="{row}">
-          <el-button type="warning" size="mini" icon="el-icon-edit" @click="showDialog(row)"
+          <el-button type="warning" size="mini" icon="el-icon-edit" @click="showDialog(row)"      
+          v-has-permission="`Trademark.update`"
             >编辑</el-button
           >
           <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteAttr(row)"
+          v-has-permission="`Trademark.remove`"
             >删除</el-button
           >
         </template>
