@@ -35,6 +35,7 @@ module.exports={
             {
                 test:/\.less$/,
                 use:[
+                    "thread-loader",
                     "style-loader",
                     "css-loader",
                     "less-loader"

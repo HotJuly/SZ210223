@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 /*
     cache:缓存
-        强缓存->cache-control:maxAge=36000
+        强缓存->cache-control:maxAge=3600000000000000
             如果第二次请求资源,如果距离第一次请求资源没有超过maxAge,就会使用之前请求的文件
 
         协商缓存->e-tag和lastmodified
@@ -81,9 +81,9 @@ module.exports={
         },
         extensions:[".vue",".jsx",".js",".json"]//配置文件扩展名,如果引入文件时候没有写具体扩展名,他会尝试该数组所有的扩展名
     },
-    optimization:{
-        runtimeChunk:{
-            name:entrypoint=>`runtime~${entrypoint.name}`
-        }
-    }
+    // optimization:{
+    //     runtimeChunk:{
+    //         name:entrypoint=>`runtime~${entrypoint.name}`
+    //     }
+    // }
 }
